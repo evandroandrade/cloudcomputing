@@ -63,14 +63,26 @@ jobs:
                   continue
               try:
                   remote_dir = '/'.join(remote.split('/')[:-1])
+                  remote_file = remote.split('/')[-1]
+                  
+                  # Sempre voltar para raiz e ir ao diretorio correto
+                  ftp.cwd('/')
                   try:
                       ftp.cwd(remote_dir)
                   except:
-                      ftp.mkd(remote_dir)
-                      ftp.cwd(remote_dir)
+                      # Criar diretorios pai recursivamente
+                      parts = remote_dir.strip('/').split('/')
+                      current = ''
+                      for part in parts:
+                          current = current + '/' + part
+                          try:
+                              ftp.cwd(current)
+                          except:
+                              ftp.mkd(current)
+                              ftp.cwd(current)
 
                   with open(local, 'rb') as f:
-                      ftp.storbinary(f'STOR {remote.split("/")[-1]}', f)
+                      ftp.storbinary(f'STOR {remote_file}', f)
 
                   size = os.path.getsize(local)
                   print(f'OK ({size} bytes): {local}')
