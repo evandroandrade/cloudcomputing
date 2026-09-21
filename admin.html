@@ -968,30 +968,102 @@
             const grid = document.getElementById('students-grid');
             grid.innerHTML = '';
 
+            if (!allStudents || allStudents.length === 0) {
+                grid.innerHTML = '<p style="color:#6b7280;text-align:center;padding:2rem;">Nenhum aluno encontrado.</p>';
+                return;
+            }
+
+            // Agrupar por ano de criação e status
+            const grupos = {};
             allStudents.forEach(student => {
-                const card = document.createElement('div');
-                card.className = 'student-card';
-                card.innerHTML = `
-                    <div class="student-info">
-                        <div>
-                            <div class="student-name">${student.nome}</div>
-                            <div class="student-matricula">${student.matricula}</div>
-                        </div>
-                    </div>
-                    <div class="student-actions">
-                        <button class="btn-action btn-reset" onclick="resetStudentPassword('${student.matricula}')">
-                            <i class="fas fa-key"></i> Reset Senha
-                        </button>
-                        <button class="btn-action btn-edit" onclick="editStudent('${student.id}')">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn-action ${student.desabilitado ? 'btn-success' : 'btn-delete'}" onclick="deleteStudent('${student.id}')">
-                            <i class="fas fa-${student.desabilitado ? 'user-check' : 'user-slash'}"></i>
-                            ${student.desabilitado ? 'Reativar' : 'Desabilitar'}
-                        </button>
-                    </div>
+                const ano = student.created_at
+                    ? new Date(student.created_at).getFullYear()
+                    : 'Sem data';
+                const status = student.desabilitado ? 'Desabilitados' : 'Ativos';
+                const chave = `${ano}|||${status}`;
+                if (!grupos[chave]) grupos[chave] = { ano, status, alunos: [] };
+                grupos[chave].alunos.push(student);
+            });
+
+            // Ordenar grupos: ano desc, Ativos antes de Desabilitados
+            const gruposOrdenados = Object.values(grupos).sort((a, b) => {
+                if (b.ano !== a.ano) return String(b.ano).localeCompare(String(a.ano));
+                return a.status === 'Ativos' ? -1 : 1;
+            });
+
+            gruposOrdenados.forEach(grupo => {
+                // Cabeçalho do grupo
+                const header = document.createElement('div');
+                header.style.cssText = `
+                    grid-column: 1 / -1;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    margin: 1.5rem 0 0.5rem;
+                    padding-bottom: 0.5rem;
+                    border-bottom: 2px solid ${grupo.status === 'Ativos' ? '#3b82f6' : '#9ca3af'};
                 `;
-                grid.appendChild(card);
+                header.innerHTML = `
+                    <span style="
+                        background: ${grupo.status === 'Ativos' ? '#dbeafe' : '#f3f4f6'};
+                        color: ${grupo.status === 'Ativos' ? '#1e40af' : '#4b5563'};
+                        padding: 0.25rem 0.75rem;
+                        border-radius: 1rem;
+                        font-weight: 700;
+                        font-size: 0.9rem;
+                    ">${grupo.ano}</span>
+                    <span style="
+                        background: ${grupo.status === 'Ativos' ? '#d1fae5' : '#fee2e2'};
+                        color: ${grupo.status === 'Ativos' ? '#065f46' : '#991b1b'};
+                        padding: 0.25rem 0.75rem;
+                        border-radius: 1rem;
+                        font-weight: 600;
+                        font-size: 0.85rem;
+                    ">${grupo.status}</span>
+                    <span style="color:#6b7280;font-size:0.85rem;">${grupo.alunos.length} aluno(s)</span>
+                `;
+                grid.appendChild(header);
+
+                // Cards dos alunos do grupo
+                grupo.alunos
+                    .sort((a, b) => a.nome.localeCompare(b.nome))
+                    .forEach(student => {
+                        const card = document.createElement('div');
+                        card.className = 'student-card';
+                        card.style.opacity = student.desabilitado ? '0.65' : '1';
+                        card.innerHTML = `
+                            <div class="student-info">
+                                <div>
+                                    <div class="student-name">${student.nome}</div>
+                                    <div class="student-matricula">${student.matricula}</div>
+                                    ${student.email ? `<div style="font-size:0.78rem;color:#6b7280;">${student.email}</div>` : ''}
+                                    <div style="margin-top:0.25rem;">
+                                        ${student.primeiro_login
+                                            ? '<span style="background:#fef3c7;color:#92400e;font-size:0.72rem;padding:0.15rem 0.5rem;border-radius:1rem;font-weight:600;">1º login pendente</span>'
+                                            : '<span style="background:#d1fae5;color:#065f46;font-size:0.72rem;padding:0.15rem 0.5rem;border-radius:1rem;font-weight:600;">Ativo</span>'
+                                        }
+                                        ${student.desabilitado
+                                            ? '<span style="background:#fee2e2;color:#991b1b;font-size:0.72rem;padding:0.15rem 0.5rem;border-radius:1rem;font-weight:600;margin-left:0.25rem;">Desabilitado</span>'
+                                            : ''
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="student-actions">
+                                <button class="btn-action btn-reset" onclick="resetStudentPassword('${student.matricula}')">
+                                    <i class="fas fa-key"></i> Reset Senha
+                                </button>
+                                <button class="btn-action btn-edit" onclick="editStudent('${student.id}')">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="btn-action ${student.desabilitado ? 'btn-success' : 'btn-delete'}" onclick="deleteStudent('${student.id}')">
+                                    <i class="fas fa-${student.desabilitado ? 'user-check' : 'user-slash'}"></i>
+                                    ${student.desabilitado ? 'Reativar' : 'Desabilitar'}
+                                </button>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
             });
         }
 
