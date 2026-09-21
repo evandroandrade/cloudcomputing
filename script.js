@@ -2668,7 +2668,7 @@ function updateExercicioButton(exercicioId, completed) {
             button.classList.remove('completed', 'editable');
             button.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
             button.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.3)';
-            button.innerHTML = 'Vamos na Prática!';
+            button.innerHTML = '🚀 Iniciar Exercício';
             button.onclick = () => openExercicioModal(exercicioId);
             button.style.cursor = 'pointer';
             button.title = 'Clique para iniciar o exercício';
@@ -3036,7 +3036,7 @@ async function checkExercicioStatus(exerciciosExistentes) {
                 button.style.opacity = '0.5';
                 button.title = 'Exercício ainda não foi liberado';
                 button.classList.remove('completed', 'editable');
-                button.innerHTML = 'Vamos na Prática!';
+                button.innerHTML = 'Iniciar Exercício';
                 continue;
             }
 
@@ -3045,7 +3045,7 @@ async function checkExercicioStatus(exerciciosExistentes) {
                 button.style.opacity = '0.5';
                 button.style.cursor = 'not-allowed';
                 button.title = 'Faça login para acessar o exercício';
-                button.innerHTML = 'Vamos na Prática!';
+                button.innerHTML = 'Iniciar Exercício';
                 continue;
             }
 
@@ -3069,7 +3069,7 @@ async function checkExercicioStatus(exerciciosExistentes) {
                 button.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
                 button.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.3)';
                 button.title = 'Clique para acessar o exercício';
-                button.innerHTML = 'Vamos na Prática!';
+                button.innerHTML = '🚀 Iniciar Exercício';
                 button.classList.remove('completed', 'editable');
             }
         }
@@ -3226,9 +3226,9 @@ function configurarBotaoPratica(button, exercicioId) {
     button.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)'; // Gradiente azul vibrante
     button.style.color = 'white';
     button.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.3)';
-    button.innerHTML = 'Vamos na Prática!';
+    button.innerHTML = '🚀 Iniciar Exercício';
     button.title = 'Exercício liberado - clique para começar';
-    console.log(`🔵 Botão ${exercicioId} configurado: VAMOS NA PRÁTICA`);
+    console.log(`🔵 Botão ${exercicioId} configurado: INICIAR EXERCÍCIO`);
 }
 
 function configurarBotaoErro(button, exercicioId) {
