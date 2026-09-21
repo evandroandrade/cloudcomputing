@@ -12,63 +12,79 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Setup lftp
-        run: sudo apt-get install -y lftp
-
-      - name: Upload arquivos raiz
+      - name: Deploy via Python FTP
         env:
           FTP_HOST: ftp.evandroandrade.com
           FTP_USER: ${{ secrets.FTP_USERNAME }}
           FTP_PASS: ${{ secrets.FTP_PASSWORD }}
         run: |
-          lftp -u "$FTP_USER","$FTP_PASS" "$FTP_HOST" << EOF
-          set ftp:ssl-allow no
-          set net:timeout 60
-          cd /public_html/cloudcomputing
-          put index.html
-          put admin.html
-          put admin-login.html
-          put styles.css
-          put script.js
-          put manifest.json
-          put .htaccess
-          put favicon.ico
-          put browserconfig.xml
-          mput *.png
-          echo "Raiz OK"
-          quit
-          EOF
+          python3 << 'PYEOF'
+          import ftplib
+          import os
+          import sys
 
-      - name: Upload pasta js/
-        env:
-          FTP_HOST: ftp.evandroandrade.com
-          FTP_USER: ${{ secrets.FTP_USERNAME }}
-          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
-        run: |
-          cd js
-          lftp -u "$FTP_USER","$FTP_PASS" "$FTP_HOST" << EOF
-          set ftp:ssl-allow no
-          set net:timeout 60
-          cd /public_html/cloudcomputing/js
-          put security.js
-          put secure-auth.js
-          echo "js/ OK"
-          quit
-          EOF
+          HOST = os.environ['FTP_HOST']
+          USER = os.environ['FTP_USER']
+          PASS = os.environ['FTP_PASS']
+          REMOTE_BASE = '/public_html/cloudcomputing'
 
-      - name: Upload pasta config/
-        env:
-          FTP_HOST: ftp.evandroandrade.com
-          FTP_USER: ${{ secrets.FTP_USERNAME }}
-          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
-        run: |
-          cd config
-          lftp -u "$FTP_USER","$FTP_PASS" "$FTP_HOST" << EOF
-          set ftp:ssl-allow no
-          set net:timeout 60
-          cd /public_html/cloudcomputing/config
-          put supabase.js
-          put exercicios.json
-          echo "config/ OK"
-          quit
-          EOF
+          # Arquivos para enviar: (caminho_local, caminho_remoto)
+          files = [
+              ('index.html',              f'{REMOTE_BASE}/index.html'),
+              ('admin.html',              f'{REMOTE_BASE}/admin.html'),
+              ('admin-login.html',        f'{REMOTE_BASE}/admin-login.html'),
+              ('styles.css',              f'{REMOTE_BASE}/styles.css'),
+              ('script.js',               f'{REMOTE_BASE}/script.js'),
+              ('manifest.json',           f'{REMOTE_BASE}/manifest.json'),
+              ('.htaccess',               f'{REMOTE_BASE}/.htaccess'),
+              ('favicon.ico',             f'{REMOTE_BASE}/favicon.ico'),
+              ('browserconfig.xml',       f'{REMOTE_BASE}/browserconfig.xml'),
+              ('js/security.js',          f'{REMOTE_BASE}/js/security.js'),
+              ('js/secure-auth.js',       f'{REMOTE_BASE}/js/secure-auth.js'),
+              ('config/supabase.js',      f'{REMOTE_BASE}/config/supabase.js'),
+              ('config/exercicios.json',  f'{REMOTE_BASE}/config/exercicios.json'),
+          ]
+
+          # Adicionar PNGs
+          for f in os.listdir('.'):
+              if f.endswith('.png'):
+                  files.append((f, f'{REMOTE_BASE}/{f}'))
+
+          print(f'Conectando em {HOST}...')
+          ftp = ftplib.FTP(HOST)
+          ftp.login(USER, PASS)
+          ftp.set_pasv(True)
+          print('Conectado!')
+
+          ok = 0
+          erros = 0
+
+          for local, remote in files:
+              if not os.path.exists(local):
+                  print(f'SKIP (nao existe): {local}')
+                  continue
+              try:
+                  # Garantir que o diretorio remoto existe
+                  remote_dir = '/'.join(remote.split('/')[:-1])
+                  try:
+                      ftp.cwd(remote_dir)
+                  except:
+                      print(f'Criando diretorio: {remote_dir}')
+                      ftp.mkd(remote_dir)
+                      ftp.cwd(remote_dir)
+
+                  # Upload
+                  with open(local, 'rb') as f:
+                      ftp.storbinary(f'STOR {remote.split("/")[-1]}', f)
+                  size = os.path.getsize(local)
+                  print(f'OK ({size} bytes): {local} -> {remote}')
+                  ok += 1
+              except Exception as e:
+                  print(f'ERRO: {local} -> {e}')
+                  erros += 1
+
+          ftp.quit()
+          print(f'\n=== RESULTADO: {ok} OK, {erros} erros ===')
+          if erros > 0:
+              sys.exit(1)
+          PYEOF
