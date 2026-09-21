@@ -2032,7 +2032,7 @@ async function openExercicioModal(exercicioId) {
         if (exercicioExiste) {
             console.log(`📝 Exercício ${exercicioId} já existe, carregando dados...`);
             // Carregar dados existentes do exercício
-            const exercicio = await window.buscarExercicioPorUsuario(exercicioId, usuarioGlobal.matricula);
+            const exercicio = await window.buscarExercicioPorUsuario(exercicioId);
             if (exercicio && exercicio.success && exercicio.data) {
                 console.log(`📊 Dados encontrados para exercício ${exercicioId}:`, exercicio.data);
                 // Preencher formulário com dados existentes
@@ -3409,10 +3409,8 @@ async function loadExercicioData(exercicioId) {
             return;
         }
         
-        const matricula = usuarioGlobal.matricula;
-        
-        // Buscar exercício no Supabase
-        const exercicio = await window.buscarExercicioPorUsuario(exercicioId, matricula);
+        // Buscar exercício via RLS (auth.uid() identifica o aluno)
+        const exercicio = await window.buscarExercicioPorUsuario(exercicioId);
         
         if (exercicio && exercicio.success && exercicio.data) {
             console.log(`✅ Exercício ${exercicioId} encontrado para usuário ${matricula}`);
@@ -4516,7 +4514,7 @@ window.testarSalvamento = async function(exercicioId = 1) {
         console.log('✅ Resultado do salvamento:', resultado);
         
         // Verificar se foi salvo
-        const exercicioSalvo = await window.buscarExercicioPorUsuario(exercicioId, usuarioFinal.matricula);
+        const exercicioSalvo = await window.buscarExercicioPorUsuario(exercicioId);
         console.log('🔍 Exercício salvo:', exercicioSalvo);
         
     } catch (error) {
