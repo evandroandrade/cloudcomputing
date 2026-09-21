@@ -1,4 +1,16 @@
-# Desabilitar cache para garantir versao sempre atualizada
+Options -Indexes
+
+# Remover extensão .html das URLs
+RewriteEngine On
+
+# Se o arquivo sem extensão não existe como diretório
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# Tentar adicionar .html
+RewriteRule ^([^\.]+)$ $1.html [NC,L]
+
+# Cache control
 <FilesMatch "\.(html|js|css|json)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
