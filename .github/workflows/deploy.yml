@@ -15,7 +15,7 @@ jobs:
       - name: Setup lftp
         run: sudo apt-get install -y lftp
 
-      - name: Upload todos os arquivos
+      - name: Upload arquivos raiz
         env:
           FTP_HOST: ftp.evandroandrade.com
           FTP_USER: ${{ secrets.FTP_USERNAME }}
@@ -24,11 +24,7 @@ jobs:
           lftp -u "$FTP_USER","$FTP_PASS" "$FTP_HOST" << EOF
           set ftp:ssl-allow no
           set net:timeout 60
-          set net:max-retries 5
-
           cd /public_html/cloudcomputing
-          echo "Conectado - iniciando upload"
-
           put index.html
           put admin.html
           put admin-login.html
@@ -39,19 +35,40 @@ jobs:
           put favicon.ico
           put browserconfig.xml
           mput *.png
+          echo "Raiz OK"
+          quit
+          EOF
 
-          echo "Subindo pasta js/"
+      - name: Upload pasta js/
+        env:
+          FTP_HOST: ftp.evandroandrade.com
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+        run: |
           cd js
-          put ../js/security.js -o security.js
-          put ../js/secure-auth.js -o secure-auth.js
-          cd ..
+          lftp -u "$FTP_USER","$FTP_PASS" "$FTP_HOST" << EOF
+          set ftp:ssl-allow no
+          set net:timeout 60
+          cd /public_html/cloudcomputing/js
+          put security.js
+          put secure-auth.js
+          echo "js/ OK"
+          quit
+          EOF
 
-          echo "Subindo pasta config/"
+      - name: Upload pasta config/
+        env:
+          FTP_HOST: ftp.evandroandrade.com
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+        run: |
           cd config
-          put ../config/supabase.js -o supabase.js
-          put ../config/exercicios.json -o exercicios.json
-          cd ..
-
-          echo "Upload concluido!"
+          lftp -u "$FTP_USER","$FTP_PASS" "$FTP_HOST" << EOF
+          set ftp:ssl-allow no
+          set net:timeout 60
+          cd /public_html/cloudcomputing/config
+          put supabase.js
+          put exercicios.json
+          echo "config/ OK"
           quit
           EOF
