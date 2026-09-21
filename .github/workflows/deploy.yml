@@ -15,56 +15,43 @@ jobs:
       - name: Setup lftp
         run: sudo apt-get install -y lftp
 
-      - name: Upload TODOS os arquivos com verbose
+      - name: Upload todos os arquivos
         env:
           FTP_HOST: ftp.evandroandrade.com
           FTP_USER: ${{ secrets.FTP_USERNAME }}
           FTP_PASS: ${{ secrets.FTP_PASSWORD }}
         run: |
-          cat > /tmp/deploy.lftp << 'EOF'
+          lftp -u "$FTP_USER","$FTP_PASS" "$FTP_HOST" << EOF
           set ftp:ssl-allow no
           set net:timeout 60
           set net:max-retries 5
-          set ftp:passive-mode yes
-          open ftp://$FTP_USER:$FTP_PASS@$FTP_HOST
-          
+
           cd /public_html/cloudcomputing
-          
-          echo "=== Uploading index.html ==="
-          put -v index.html
-          
-          echo "=== Uploading admin.html ==="
-          put -v admin.html
-          
-          echo "=== Uploading admin-login.html ==="
-          put -v admin-login.html
-          
-          echo "=== Uploading styles.css ==="
-          put -v styles.css
-          
-          echo "=== Uploading script.js ==="
-          put -v script.js
-          
-          echo "=== Uploading manifest.json ==="
-          put -v manifest.json
-          
-          echo "=== Uploading .htaccess ==="
-          put -v .htaccess
-          
-          echo "=== Uploading js/security.js ==="
+          echo "Conectado - iniciando upload"
+
+          put index.html
+          put admin.html
+          put admin-login.html
+          put styles.css
+          put script.js
+          put manifest.json
+          put .htaccess
+          put favicon.ico
+          put browserconfig.xml
+          mput *.png
+
+          echo "Subindo pasta js/"
           cd js
-          put -v ../js/security.js -o security.js
-          put -v ../js/secure-auth.js -o secure-auth.js
+          put ../js/security.js -o security.js
+          put ../js/secure-auth.js -o secure-auth.js
           cd ..
-          
-          echo "=== Uploading config/ ==="
+
+          echo "Subindo pasta config/"
           cd config
-          put -v ../config/supabase.js -o supabase.js
-          put -v ../config/exercicios.json -o exercicios.json
+          put ../config/supabase.js -o supabase.js
+          put ../config/exercicios.json -o exercicios.json
           cd ..
-          
-          echo "=== DONE ==="
+
+          echo "Upload concluido!"
           quit
           EOF
-          
-          lftp -f /tmp/deploy.lftp
