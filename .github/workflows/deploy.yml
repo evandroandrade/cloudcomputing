@@ -26,7 +26,7 @@ jobs:
           HOST = os.environ['FTP_HOST']
           USER = os.environ['FTP_USER']
           PASS = os.environ['FTP_PASS']
-          REMOTE_BASE = '/home1/evan2391/evandroandrade.com/cloudcomputing'
+          REMOTE_BASE = 'evandroandrade.com/cloudcomputing'
 
           files = [
               ('index.html',             f'{REMOTE_BASE}/index.html'),
