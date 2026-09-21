@@ -922,45 +922,114 @@
             const tbody = document.getElementById('exercises-table');
             tbody.innerHTML = '';
 
-            // Agrupar exercícios por ID
-            const exerciciosAgrupados = {};
+            // Agrupar por ano de criação do exercício
+            const porAno = {};
             allExercises.forEach(exercicio => {
-                if (!exerciciosAgrupados[exercicio.exercicio_id]) {
-                    exerciciosAgrupados[exercicio.exercicio_id] = [];
-                }
-                exerciciosAgrupados[exercicio.exercicio_id].push(exercicio);
+                const ano = exercicio.created_at
+                    ? new Date(exercicio.created_at).getFullYear()
+                    : 'Sem data';
+                if (!porAno[ano]) porAno[ano] = {};
+                if (!porAno[ano][exercicio.exercicio_id]) porAno[ano][exercicio.exercicio_id] = [];
+                porAno[ano][exercicio.exercicio_id].push(exercicio);
             });
 
-            // Criar linhas para cada exercício
-            Object.keys(exerciciosAgrupados).forEach(exercicioId => {
-                const exercicios = exerciciosAgrupados[exercicioId];
-                const totalAlunos = allStudents.length;
-                const alunosEntregaram = exercicios.length;
-                const taxaConclusao = totalAlunos > 0 ? Math.round((alunosEntregaram / totalAlunos) * 100) : 0;
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>Exercício ${exercicioId}</td>
-                    <td>${alunosEntregaram}/${totalAlunos}</td>
-                    <td>${taxaConclusao}%</td>
-                    <td>
-                        <span class="status-badge ${taxaConclusao >= 80 ? 'success' : taxaConclusao >= 50 ? 'warning' : 'danger'}">
-                            ${taxaConclusao >= 80 ? 'Excelente' : taxaConclusao >= 50 ? 'Bom' : 'Atenção'}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn-action btn-primary" onclick="viewExerciseDetails(${exercicioId})">
-                                <i class="fas fa-eye"></i> Ver Detalhes
-                            </button>
-                            <button class="btn-action btn-success" onclick="downloadAllExercisePDFs(${exercicioId})">
-                                <i class="fas fa-download"></i> Baixar Todos PDFs
+            const anosOrdenados = Object.keys(porAno).sort((a, b) => String(b).localeCompare(String(a)));
+
+            anosOrdenados.forEach(ano => {
+                // Cabeçalho do ano com botão de download geral do ano
+                const headerRow = document.createElement('tr');
+                headerRow.innerHTML = `
+                    <td colspan="5" style="
+                        background: linear-gradient(135deg, #1e40af, #3b82f6);
+                        color: white;
+                        font-weight: 700;
+                        font-size: 1rem;
+                        padding: 0.75rem 1rem;
+                    ">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <span><i class="fas fa-calendar-alt"></i> Turma ${ano}</span>
+                            <button class="btn-action" onclick="downloadAnoExerciciosPDFs(${ano})" style="
+                                background:white;color:#1e40af;font-weight:600;font-size:0.8rem;padding:0.4rem 0.8rem;
+                            ">
+                                <i class="fas fa-download"></i> Baixar todos de ${ano}
                             </button>
                         </div>
                     </td>
                 `;
-                tbody.appendChild(row);
+                tbody.appendChild(headerRow);
+
+                const exerciciosDoAno = porAno[ano];
+                const totalAlunos = allStudents.length;
+
+                Object.keys(exerciciosDoAno).sort((a,b) => parseInt(a)-parseInt(b)).forEach(exercicioId => {
+                    const exercicios = exerciciosDoAno[exercicioId];
+                    const alunosEntregaram = exercicios.length;
+                    const taxaConclusao = totalAlunos > 0 ? Math.round((alunosEntregaram / totalAlunos) * 100) : 0;
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>Exercício ${exercicioId}</td>
+                        <td>${alunosEntregaram}/${totalAlunos}</td>
+                        <td>${taxaConclusao}%</td>
+                        <td>
+                            <span class="status-badge ${taxaConclusao >= 80 ? 'success' : taxaConclusao >= 50 ? 'warning' : 'danger'}">
+                                ${taxaConclusao >= 80 ? 'Excelente' : taxaConclusao >= 50 ? 'Bom' : 'Atenção'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn-action btn-primary" onclick="viewExerciseDetails(${exercicioId})">
+                                    <i class="fas fa-eye"></i> Ver Detalhes
+                                </button>
+                                <button class="btn-action btn-success" onclick="downloadAllExercisePDFs(${exercicioId})">
+                                    <i class="fas fa-download"></i> Baixar PDFs
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
             });
+        }
+
+        // Baixar todos os PDFs de um ano específico
+        async function downloadAnoExerciciosPDFs(ano) {
+            const exerciciosDoAno = allExercises.filter(ex => {
+                const exAno = ex.created_at ? new Date(ex.created_at).getFullYear() : null;
+                return exAno == ano;
+            });
+
+            if (exerciciosDoAno.length === 0) {
+                alert(`Nenhum exercício encontrado para o ano ${ano}.`);
+                return;
+            }
+
+            if (!confirm(`Baixar ${exerciciosDoAno.length} PDFs da turma ${ano}?`)) return;
+
+            const { jsPDF } = window.jspdf;
+            const loadingModal = document.createElement('div');
+            loadingModal.className = 'modal';
+            loadingModal.style.display = 'block';
+            loadingModal.innerHTML = `
+                <div class="modal-content" style="max-width:400px;text-align:center;">
+                    <div class="modal-body">
+                        <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#1e40af;"></i>
+                        <h3 style="margin:1rem 0 0.5rem">Gerando PDFs — Turma ${ano}</h3>
+                        <div id="progress-ano-text">Preparando...</div>
+                    </div>
+                </div>`;
+            document.body.appendChild(loadingModal);
+
+            for (let i = 0; i < exerciciosDoAno.length; i++) {
+                const ex = exerciciosDoAno[i];
+                const prog = document.getElementById('progress-ano-text');
+                if (prog) prog.textContent = `${i + 1}/${exerciciosDoAno.length}: ${ex.nome}`;
+                await new Promise(r => setTimeout(r, 300));
+                await generateSinglePDF(ex, jsPDF);
+            }
+
+            loadingModal.remove();
+            alert(`✅ ${exerciciosDoAno.length} PDFs gerados — Turma ${ano}`);
         }
 
         // Atualizar grid de alunos
