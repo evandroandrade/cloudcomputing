@@ -7,18 +7,38 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Deploy via FTP — força upload total
-        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
-        with:
-          ftp_host: ftp.evandroandrade.com
-          ftp_username: ${{ secrets.FTP_USERNAME }}
-          ftp_password: ${{ secrets.FTP_PASSWORD }}
-          local_source_dir: "."
-          dist_target_dir: "/public_html/cloudcomputing"
-          delete: "true"
-          exclude: "^(.git|node_modules|migrations|scripts|supabase|\.env|.*\.bat|MIGRACAO_AUTH\.md|teste-.*\.html|test-.*\.html|.*\.md|package.*\.json)$"
+      - name: Setup lftp
+        run: sudo apt-get install -y lftp
+
+      - name: Deploy via LFTP para HostGator
+        env:
+          FTP_HOST: ftp.evandroandrade.com
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          lftp -c "
+            set ftp:ssl-allow no;
+            set net:timeout 30;
+            set net:max-retries 3;
+            open ftp://$FTP_USER:$FTP_PASS@$FTP_HOST;
+            mirror --reverse --delete --verbose \
+              --exclude-glob .git \
+              --exclude-glob .github \
+              --exclude-glob node_modules \
+              --exclude-glob migrations \
+              --exclude-glob scripts \
+              --exclude-glob supabase \
+              --exclude-glob '*.bat' \
+              --exclude-glob '*.md' \
+              --exclude-glob 'teste-*.html' \
+              --exclude-glob 'test-*.html' \
+              --exclude-glob 'package*.json' \
+              --exclude-glob '.env*' \
+              . /public_html/cloudcomputing;
+            quit
+          "
