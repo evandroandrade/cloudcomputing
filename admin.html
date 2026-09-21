@@ -518,9 +518,98 @@
                 text-align: left;
             }
         }
+        /* Toast notifications */
+        .admin-toast {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+        .admin-toast-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.9rem 1.25rem;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            pointer-events: all;
+            animation: toastIn 0.3s ease;
+            max-width: 380px;
+        }
+        @keyframes toastIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to   { transform: translateX(0);   opacity: 1; }
+        }
+        .admin-toast-item.success { background: #059669; }
+        .admin-toast-item.error   { background: #dc2626; }
+        .admin-toast-item.info    { background: #1e40af; }
+        .admin-toast-item.warning { background: #d97706; }
+
+        /* Confirm modal */
+        .admin-confirm-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9998;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+        }
+        .admin-confirm-box {
+            background: white; border-radius: 1rem;
+            padding: 2rem; max-width: 420px; width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .admin-confirm-box h4 { margin: 0 0 0.75rem; color: #1f2937; font-size: 1.1rem; }
+        .admin-confirm-box p  { margin: 0 0 1.5rem; color: #4b5563; line-height: 1.5; }
+        .admin-confirm-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
     </style>
 </head>
 <body>
+    <!-- Toast container -->
+    <div id="admin-toast" class="admin-toast"></div>
+
+    <script>
+    // ============================================================
+    // Sistema de notificações e confirmações do painel admin
+    // Substitui alert() e confirm() do JavaScript nativo
+    // ============================================================
+
+    function adminToast(msg, tipo = 'info', duracao = 4000) {
+        const container = document.getElementById('admin-toast');
+        if (!container) return;
+        const icons = { success: 'check-circle', error: 'times-circle', info: 'info-circle', warning: 'exclamation-triangle' };
+        const item = document.createElement('div');
+        item.className = `admin-toast-item ${tipo}`;
+        item.innerHTML = `<i class="fas fa-${icons[tipo] || 'info-circle'}"></i><span>${msg}</span>`;
+        container.appendChild(item);
+        setTimeout(() => item.remove(), duracao);
+    }
+
+    function adminConfirm(msg, titulo = 'Confirmar') {
+        return new Promise(resolve => {
+            const overlay = document.createElement('div');
+            overlay.className = 'admin-confirm-overlay';
+            overlay.innerHTML = `
+                <div class="admin-confirm-box">
+                    <h4><i class="fas fa-question-circle" style="color:#1e40af;margin-right:0.5rem;"></i>${titulo}</h4>
+                    <p>${msg}</p>
+                    <div class="admin-confirm-actions">
+                        <button id="confirm-no"  class="btn btn-secondary">Cancelar</button>
+                        <button id="confirm-yes" class="btn btn-primary">Confirmar</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            overlay.querySelector('#confirm-yes').onclick = () => { overlay.remove(); resolve(true); };
+            overlay.querySelector('#confirm-no').onclick  = () => { overlay.remove(); resolve(false); };
+        });
+    }
+    </script>
     <div class="admin-container">
         <!-- Header -->
         <div class="admin-header">
@@ -817,10 +906,9 @@
 
         // Logout seguro
         async function fazerLogoutAdmin() {
-            if (confirm('Deseja realmente sair do painel administrativo?')) {
-                await window.SecureAuth.logoutSeguro();
-                window.location.href = 'admin-login.html';
-            }
+            if (!await adminConfirm('Deseja realmente sair do painel administrativo?', 'Logout')) return;
+            await window.SecureAuth.logoutSeguro();
+            window.location.href = 'admin-login.html';
         }
 
         // Função para mostrar tabs
@@ -1000,11 +1088,10 @@
             });
 
             if (exerciciosDoAno.length === 0) {
-                alert(`Nenhum exercício encontrado para o ano ${ano}.`);
+                adminToast(`Nenhum exercício encontrado para o ano ${ano}.`, 'warning');
                 return;
             }
-
-            if (!confirm(`Baixar ${exerciciosDoAno.length} PDFs da turma ${ano}?`)) return;
+            if (!await adminConfirm(`Baixar ${exerciciosDoAno.length} PDFs da turma ${ano}?`, 'Download')) return;
 
             const { jsPDF } = window.jspdf;
             const loadingModal = document.createElement('div');
@@ -1029,7 +1116,7 @@
             }
 
             loadingModal.remove();
-            alert(`✅ ${exerciciosDoAno.length} PDFs gerados — Turma ${ano}`);
+            adminToast(`${exerciciosDoAno.length} PDFs gerados — Turma ${ano}`, 'success');
         }
 
         // Atualizar grid de alunos
@@ -1140,7 +1227,7 @@
         async function resetStudentPassword(matricula) {
             const student = allStudents.find(s => s.matricula === matricula);
             const nome = student ? student.nome : matricula;
-            if (!confirm(`Resetar a senha de "${nome}" para a própria matrícula?\n\nO aluno precisará definir uma nova senha no próximo acesso.`)) return;
+            if (!await adminConfirm(`Resetar a senha de "${nome}" para a própria matrícula?<br><small>O aluno precisará definir uma nova senha no próximo acesso.</small>`, 'Resetar Senha')) return;
 
             try {
                 const { data: { session } } = await window.supabaseClient.auth.getSession();
@@ -1154,10 +1241,10 @@
                 });
                 const resultado = await resp.json();
                 if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
-                alert(`✅ Senha temporária redefinida para a matrícula.\nO aluno deverá alterar no próximo acesso.`);
+                adminToast('Senha temporária redefinida para a matrícula. O aluno deverá alterar no próximo acesso.', 'success');
                 loadStudentsData();
             } catch (error) {
-                alert('❌ Erro ao resetar senha: ' + error.message);
+                adminToast('Erro ao resetar senha: ' + error.message, 'error');
             }
         }
 
@@ -1180,11 +1267,11 @@
             const nome      = document.getElementById('edit-student-name').value.trim();
             const email     = document.getElementById('edit-student-email').value.trim();
 
-            if (!nome) { alert('Nome é obrigatório.'); return; }
+            if (!nome) { adminToast('Nome é obrigatório.', 'warning'); return; }
 
             // Descobrir auth_user_id do aluno
             const student = allStudents.find(s => s.id === studentId || s.id === parseInt(studentId));
-            if (!student) { alert('Aluno não encontrado.'); return; }
+            if (!student) { adminToast('Aluno não encontrado.', 'error'); return; }
 
             try {
                 const { data: { session } } = await window.supabaseClient.auth.getSession();
@@ -1204,11 +1291,11 @@
                 const resultado = await resp.json();
                 if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
 
-                alert('✅ Aluno atualizado com sucesso!');
+                adminToast('Aluno atualizado com sucesso!', 'success');
                 closeModal('editStudentModal');
                 loadStudentsData();
             } catch (error) {
-                alert('❌ Erro ao atualizar aluno: ' + error.message);
+                adminToast('Erro ao atualizar aluno: ' + error.message, 'error');
             }
         }
 
@@ -1221,7 +1308,7 @@
             const acao = estaDesabilitado ? 'reativar' : 'desabilitar';
             const novoEstado = !estaDesabilitado;
 
-            if (!confirm(`Deseja ${acao} o aluno "${student.nome}"?\n\nO histórico e exercícios serão preservados.`)) return;
+            if (!await adminConfirm(`Deseja ${acao} o aluno "<strong>${student.nome}</strong>"?<br><small>O histórico e exercícios serão preservados.</small>`, `${acao.charAt(0).toUpperCase() + acao.slice(1)} Aluno`)) return;
 
             try {
                 const { data: { session } } = await window.supabaseClient.auth.getSession();
@@ -1240,10 +1327,10 @@
                 const resultado = await resp.json();
                 if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
 
-                alert(`✅ Aluno ${novoEstado ? 'desabilitado' : 'reativado'} com sucesso!`);
+                adminToast(`Aluno ${novoEstado ? 'desabilitado' : 'reativado'} com sucesso!`, 'success');
                 loadStudentsData();
             } catch (error) {
-                alert('❌ Erro ao alterar status: ' + error.message);
+                adminToast('Erro ao alterar status: ' + error.message, 'error');
             }
         }
 
@@ -1253,10 +1340,7 @@
             const matricula = document.getElementById('new-student-matricula').value.trim();
             const email     = document.getElementById('new-student-email').value.trim();
 
-            if (!nome || !matricula) {
-                alert('Nome e matrícula são obrigatórios.');
-                return;
-            }
+            if (!nome || !matricula) { adminToast('Nome e matrícula são obrigatórios.', 'warning'); return; }
 
             try {
                 const { data: { session } } = await window.supabaseClient.auth.getSession();
@@ -1271,12 +1355,12 @@
                 const resultado = await resp.json();
                 if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
 
-                alert(`✅ Aluno adicionado com sucesso!\nSenha temporária: matrícula (${matricula})\nO aluno será obrigado a trocar no primeiro acesso.`);
+                adminToast(`Aluno adicionado! Senha temporária: matrícula (${matricula}). O aluno deverá trocar no primeiro acesso.`, 'success', 6000);
                 closeModal('addStudentModal');
                 document.getElementById('addStudentForm').reset();
                 loadStudentsData();
             } catch (error) {
-                alert('❌ Erro ao adicionar aluno: ' + error.message);
+                adminToast('Erro ao adicionar aluno: ' + error.message, 'error');
             }
         }
 
@@ -1340,7 +1424,7 @@
             });
             
             if (exerciciosDoExercicio.length === 0) {
-                alert('Nenhum exercício encontrado para este ID.');
+                adminToast('Nenhum exercício encontrado para este ID.', 'warning');
                 return;
             }
             
@@ -1399,7 +1483,7 @@
             const exercicio = allExercises.find(ex => ex.id === exercicioId);
             
             if (!exercicio) {
-                alert('Exercício não encontrado.');
+                adminToast('Exercício não encontrado.', 'error');
                 return;
             }
             
@@ -1826,8 +1910,7 @@
         async function downloadAllExercisePDFs(exercicioId, ano) {
             try {
                 const labelAno = ano ? ` — Turma ${ano}` : '';
-                const confirmacao = confirm(`Deseja baixar todos os PDFs do Exercício ${exercicioId}${labelAno}?\n\nIsso irá gerar um PDF para cada aluno que entregou este exercício.`);
-                if (!confirmacao) return;
+            if (!await adminConfirm(`Deseja baixar todos os PDFs do Exercício ${exercicioId}${labelAno}?<br><small>Isso irá gerar um PDF para cada aluno que entregou este exercício.</small>`, 'Download PDFs')) return;
                 
                 // Filtrar por exercicioId e ano
                 const exerciciosDoTipo = allExercises.filter(ex => {
@@ -1837,8 +1920,8 @@
                     return matchId && matchAno;
                 });
                 
-                if (exerciciosDoTipo.length === 0) {
-                    alert(`Nenhum exercício ${exercicioId} foi encontrado.`);
+            if (exerciciosDoTipo.length === 0) {
+                    adminToast(`Nenhum exercício ${exercicioId} foi encontrado.`, 'warning');
                     return;
                 }
                 
@@ -1879,15 +1962,12 @@
                     await generateSinglePDF(exercicio, jsPDF);
                 }
                 
-                // Remover loading
                 loadingModal.remove();
-                
-                // Mostrar sucesso
-                alert(`✅ Sucesso!\n\n${exerciciosDoTipo.length} PDFs foram gerados e baixados.\n\nArquivos salvos na pasta de Downloads.`);
+                adminToast(`${exerciciosDoTipo.length} PDFs gerados e baixados com sucesso!`, 'success');
                 
             } catch (error) {
                 console.error('Erro ao baixar PDFs:', error);
-                alert('❌ Erro ao gerar PDFs. Tente novamente.');
+                adminToast('Erro ao gerar PDFs. Tente novamente.', 'error');
                 
                 // Remover loading se existir
                 const loadingModal = document.querySelector('.modal');
@@ -2022,7 +2102,7 @@
             const exercicio = allExercises.find(ex => ex.id === exercicioId);
             
             if (!exercicio) {
-                alert('Exercício não encontrado.');
+                adminToast('Exercício não encontrado.', 'error');
                 return;
             }
             

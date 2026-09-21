@@ -1456,39 +1456,23 @@ async function fazerLogoutGlobal() {
     showSuccessMessage('Logout realizado com sucesso!');
 }
 
-// Função para mostrar usuário logado
 function mostrarUsuarioLogado() {
-    console.log('🔄 Mostrando usuário logado:', usuarioGlobal);
-    
     const loginForm = document.getElementById('login-form-global');
     const userInfo = document.getElementById('user-info-global');
     const userName = document.getElementById('global-user-name');
     const userMatricula = document.getElementById('global-user-matricula');
     
     if (loginForm && userInfo && userName && userMatricula) {
-        // Ocultar formulário de login
         loginForm.style.display = 'none';
-        
-        // Mostrar informações do usuário
         userInfo.style.display = 'flex';
         
-        // Preencher dados do usuário
         if (usuarioGlobal && usuarioGlobal.nome && usuarioGlobal.matricula) {
             userName.textContent = usuarioGlobal.nome;
             userMatricula.textContent = `(${usuarioGlobal.matricula})`;
-            
-            console.log('✅ Usuário logado exibido:', {
-                nome: usuarioGlobal.nome,
-                matricula: usuarioGlobal.matricula
-            });
         } else {
-            console.error('❌ Dados do usuário incompletos:', usuarioGlobal);
-            // Fallback: mostrar formulário de login
             mostrarFormularioLogin();
             return;
         }
-    } else {
-        console.error('❌ Elementos do header não encontrados');
     }
 }
 
@@ -4588,7 +4572,6 @@ function initializeModalCharCounters() {
 
 // Função para mostrar seção do exercício
 function mostrarSecaoExercicio(exercicioId, userData) {
-    console.log('🔄 Mostrando seção do exercício para:', exercicioId, 'usuário:', userData);
     
     // Ocultar seção de login
     const loginSection = document.getElementById(`login-section-${exercicioId}`);

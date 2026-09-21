@@ -27,22 +27,25 @@
             background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 1rem;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+            overflow-y: auto;
         }
 
         .login-container {
             background: white;
             border-radius: 1rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            padding: 3rem;
+            padding: 2.5rem;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             position: relative;
             overflow: hidden;
+            margin: auto 0;
         }
 
         .login-container::before {
