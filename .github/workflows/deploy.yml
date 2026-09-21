@@ -25,6 +25,7 @@ jobs:
             set ftp:ssl-allow no;
             open ftp://$FTP_USER:$FTP_PASS@$FTP_HOST;
             cd /public_html/cloudcomputing;
+            put .htaccess;
             put index.html;
             put admin.html;
             put admin-login.html;
