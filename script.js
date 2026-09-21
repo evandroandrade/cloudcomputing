@@ -131,10 +131,10 @@ function mostrarTelaAlterarSenhaGlobal() {
                     </div>
 
                     <div class="form-group">
-                        <label for="email-perfil">Seu Email <span style="color:#9ca3af;font-weight:400;">(opcional — apenas para registro)</span></label>
-                        <input type="email" id="email-perfil"
+                        <label for="email-perfil">Seu Email <span style="color:#dc2626;font-weight:600;">*</span> <span style="color:#9ca3af;font-weight:400;">(obrigatório — apenas para registro e contato)</span></label>
+                        <input type="email" id="email-perfil" required
                                placeholder="seuemail@exemplo.com" autocomplete="email">
-                        <small style="color:#6b7280;">Usado apenas para contato. Não é necessário para o login.</small>
+                        <small style="color:#6b7280;">Não será usado para login. Apenas para contato do professor.</small>
                     </div>
 
                     <div id="primeiro-login-erro" style="display:none;color:#dc2626;font-size:0.9rem;margin-bottom:1rem;"></div>
@@ -185,6 +185,21 @@ async function alterarSenhaGlobal(event) {
     }
     if (novaSenha !== confirmarSenha) {
         mostrarErro('As senhas não coincidem.');
+        return;
+    }
+
+    // Validar email obrigatório
+    const emailPerfil = document.getElementById('email-perfil');
+    const emailValor = emailPerfil ? emailPerfil.value.trim() : '';
+    if (!emailValor) {
+        mostrarErro('O email é obrigatório.');
+        if (emailPerfil) emailPerfil.focus();
+        return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailValor)) {
+        mostrarErro('Digite um email válido.');
+        if (emailPerfil) emailPerfil.focus();
         return;
     }
 
