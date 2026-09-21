@@ -3160,3 +3160,5 @@ input[readonly]::before, textarea[readonly]::before, .field-readonly::before {
 .p-4 { padding: var(--spacing-lg); }
 .p-5 { padding: var(--spacing-xl); }
 
+
+/* Deploy forcado: 2026-09-21 12:09:21 */

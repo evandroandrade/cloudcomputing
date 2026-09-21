@@ -20,6 +20,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /public_html/cloudcomputing/
           dangerous-clean-slate: true
+          log-level: verbose
           exclude: |
             **/.git*
             **/.git*/**
@@ -32,3 +33,4 @@ jobs:
             **/teste-*.html
             **/test-*.html
             **/.env*
+            **/.ftp-deploy-sync-state.json

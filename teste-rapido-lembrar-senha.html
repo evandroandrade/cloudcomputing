@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Rápido - Lembrar Senha</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste Rápido - Botão Lembrar Senha</h1>
+        
+        <div class="test-section">
+            <h3>Teste do Botão Lembrar Senha</h3>
+            <button type="button" class="btn btn-secondary btn-lembrar-senha" onclick="testarBotaoLembrarSenha()">
+                <i class="fas fa-lightbulb"></i> Lembrar Senha
+            </button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Verificar Funções no Console</h3>
+            <button type="button" class="btn btn-primary" onclick="verificarFuncoes()">
+                Verificar Funções
+            </button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Teste de Modal</h3>
+            <button type="button" class="btn btn-success" onclick="testarModal()">
+                Testar Modal
+            </button>
+        </div>
+    </div>
+
+    <script src="config/supabase.js"></script>
+    <script src="script.js"></script>
+    
+    <script>
+        function testarBotaoLembrarSenha() {
+            console.log('🔍 Testando botão Lembrar Senha...');
+            alert('Botão clicado! Verifique o console para logs.');
+        }
+        
+        function verificarFuncoes() {
+            console.log('🔍 Verificando funções disponíveis...');
+            console.log('mostrarModalLembrarSenha:', typeof window.mostrarModalLembrarSenha);
+            console.log('fecharModalLembrarSenha:', typeof window.fecharModalLembrarSenha);
+            console.log('verificarLembrete:', typeof window.verificarLembrete);
+            console.log('mostrarSenhaRecuperada:', typeof window.mostrarSenhaRecuperada);
+            console.log('fecharModalSenhaRecuperada:', typeof window.fecharModalSenhaRecuperada);
+            console.log('copiarSenha:', typeof window.copiarSenha);
+            
+            alert('Verifique o console para ver as funções disponíveis!');
+        }
+        
+        function testarModal() {
+            if (typeof window.mostrarModalLembrarSenha === 'function') {
+                window.mostrarModalLembrarSenha(1);
+                console.log('✅ Modal aberto com sucesso!');
+            } else {
+                console.error('❌ Função mostrarModalLembrarSenha não encontrada!');
+                alert('❌ Função não encontrada! Verifique o console.');
+            }
+        }
+        
+        // Verificar quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Página carregada!');
+            console.log('🔍 Verificando funções disponíveis...');
+            console.log('mostrarModalLembrarSenha:', typeof window.mostrarModalLembrarSenha);
+        });
+    </script>
+</body>
+</html>

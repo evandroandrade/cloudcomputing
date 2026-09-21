@@ -397,3 +397,5 @@
     // Use sempre window.supabaseClient.
 
 }());
+
+/* Deploy forcado: 2026-09-21 12:09:21 */

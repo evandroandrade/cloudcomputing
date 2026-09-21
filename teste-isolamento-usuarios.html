@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Isolamento de Usuários</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .teste { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .sucesso { background-color: #d4edda; border-color: #c3e6cb; }
+        .erro { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de Isolamento de Usuários</h1>
+    
+    <div class="teste info">
+        <h3>📋 Cenários de Teste:</h3>
+        <ul>
+            <li><strong>Usuário A</strong> (matrícula: TESTE001) salva exercício 1</li>
+            <li><strong>Usuário B</strong> (matrícula: TESTE002) salva exercício 1</li>
+            <li><strong>Usuário A</strong> salva exercício 2</li>
+            <li><strong>Usuário B</strong> salva exercício 2</li>
+            <li>Verificar se cada usuário vê apenas seus dados</li>
+        </ul>
+    </div>
+
+    <div class="teste">
+        <h3>🔧 Controles de Teste:</h3>
+        <button onclick="testarUsuarioA()">Testar Usuário A (TESTE001)</button>
+        <button onclick="testarUsuarioB()">Testar Usuário B (TESTE002)</button>
+        <button onclick="verificarIsolamento()">Verificar Isolamento</button>
+        <button onclick="limparDados()">Limpar Dados de Teste</button>
+    </div>
+
+    <div id="resultados"></div>
+
+    <script src="config/supabase.js"></script>
+    <script>
+        // Simular usuários para teste
+        const usuarioA = {
+            nome: 'Usuário A',
+            matricula: 'TESTE001',
+            plataforma: 'AWS'
+        };
+
+        const usuarioB = {
+            nome: 'Usuário B', 
+            matricula: 'TESTE002',
+            plataforma: 'Azure'
+        };
+
+        let resultados = [];
+
+        function adicionarResultado(tipo, mensagem) {
+            const div = document.createElement('div');
+            div.className = `teste ${tipo}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${mensagem}`;
+            document.getElementById('resultados').appendChild(div);
+            resultados.push({tipo, mensagem, timestamp: new Date()});
+        }
+
+        async function testarUsuarioA() {
+            adicionarResultado('info', '🧪 Testando Usuário A (TESTE001)...');
+            
+            try {
+                // Simular dados do exercício 1
+                const dadosExercicio1 = {
+                    nome: usuarioA.nome,
+                    matricula: usuarioA.matricula,
+                    plataforma: usuarioA.plataforma,
+                    objetivo: `Objetivo do Usuário A - ${new Date().toLocaleTimeString()}`,
+                    passos: `Passos do Usuário A - ${new Date().toLocaleTimeString()}`,
+                    resultado: `Resultado do Usuário A - ${new Date().toLocaleTimeString()}`,
+                    dificuldades: `Dificuldades do Usuário A - ${new Date().toLocaleTimeString()}`,
+                    aprendizado: `Aprendizado do Usuário A - ${new Date().toLocaleTimeString()}`
+                };
+
+                // Salvar exercício 1
+                const resultado1 = await window.salvarExercicioSupabase({
+                    ...dadosExercicio1,
+                    exercicio_id: 1,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                });
+
+                if (resultado1.success) {
+                    adicionarResultado('sucesso', '✅ Usuário A - Exercício 1 salvo com sucesso');
+                } else {
+                    adicionarResultado('erro', `❌ Usuário A - Erro ao salvar exercício 1: ${resultado1.error}`);
+                }
+
+                // Verificar se foi salvo corretamente
+                const verificar1 = await window.buscarExercicioPorUsuario(1, usuarioA.matricula);
+                if (verificar1.success && verificar1.data) {
+                    adicionarResultado('sucesso', `✅ Usuário A - Exercício 1 encontrado: ${verificar1.data.objetivo.substring(0, 50)}...`);
+                } else {
+                    adicionarResultado('erro', '❌ Usuário A - Exercício 1 não encontrado após salvamento');
+                }
+
+            } catch (error) {
+                adicionarResultado('erro', `❌ Erro no teste do Usuário A: ${error.message}`);
+            }
+        }
+
+        async function testarUsuarioB() {
+            adicionarResultado('info', '🧪 Testando Usuário B (TESTE002)...');
+            
+            try {
+                // Simular dados do exercício 1 (mesmo exercício, usuário diferente)
+                const dadosExercicio1 = {
+                    nome: usuarioB.nome,
+                    matricula: usuarioB.matricula,
+                    plataforma: usuarioB.plataforma,
+                    objetivo: `Objetivo do Usuário B - ${new Date().toLocaleTimeString()}`,
+                    passos: `Passos do Usuário B - ${new Date().toLocaleTimeString()}`,
+                    resultado: `Resultado do Usuário B - ${new Date().toLocaleTimeString()}`,
+                    dificuldades: `Dificuldades do Usuário B - ${new Date().toLocaleTimeString()}`,
+                    aprendizado: `Aprendizado do Usuário B - ${new Date().toLocaleTimeString()}`
+                };
+
+                // Salvar exercício 1
+                const resultado1 = await window.salvarExercicioSupabase({
+                    ...dadosExercicio1,
+                    exercicio_id: 1,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                });
+
+                if (resultado1.success) {
+                    adicionarResultado('sucesso', '✅ Usuário B - Exercício 1 salvo com sucesso');
+                } else {
+                    adicionarResultado('erro', `❌ Usuário B - Erro ao salvar exercício 1: ${resultado1.error}`);
+                }
+
+                // Verificar se foi salvo corretamente
+                const verificar1 = await window.buscarExercicioPorUsuario(1, usuarioB.matricula);
+                if (verificar1.success && verificar1.data) {
+                    adicionarResultado('sucesso', `✅ Usuário B - Exercício 1 encontrado: ${verificar1.data.objetivo.substring(0, 50)}...`);
+                } else {
+                    adicionarResultado('erro', '❌ Usuário B - Exercício 1 não encontrado após salvamento');
+                }
+
+            } catch (error) {
+                adicionarResultado('erro', `❌ Erro no teste do Usuário B: ${error.message}`);
+            }
+        }
+
+        async function verificarIsolamento() {
+            adicionarResultado('info', '🔍 Verificando isolamento entre usuários...');
+            
+            try {
+                // Buscar exercício 1 do usuário A
+                const exercicioA = await window.buscarExercicioPorUsuario(1, usuarioA.matricula);
+                
+                // Buscar exercício 1 do usuário B
+                const exercicioB = await window.buscarExercicioPorUsuario(1, usuarioB.matricula);
+
+                if (exercicioA.success && exercicioA.data && exercicioB.success && exercicioB.data) {
+                    // Verificar se são registros diferentes
+                    if (exercicioA.data.id !== exercicioB.data.id) {
+                        adicionarResultado('sucesso', '✅ ISOLAMENTO CORRETO: Usuários têm registros diferentes');
+                        adicionarResultado('info', `📊 Usuário A - ID: ${exercicioA.data.id}, Objetivo: ${exercicioA.data.objetivo.substring(0, 30)}...`);
+                        adicionarResultado('info', `📊 Usuário B - ID: ${exercicioB.data.id}, Objetivo: ${exercicioB.data.objetivo.substring(0, 30)}...`);
+                    } else {
+                        adicionarResultado('erro', '❌ PROBLEMA: Usuários compartilham o mesmo registro!');
+                    }
+                } else {
+                    adicionarResultado('erro', '❌ PROBLEMA: Não foi possível verificar isolamento - dados não encontrados');
+                }
+
+            } catch (error) {
+                adicionarResultado('erro', `❌ Erro na verificação de isolamento: ${error.message}`);
+            }
+        }
+
+        async function limparDados() {
+            adicionarResultado('info', '🧹 Limpando dados de teste...');
+            
+            try {
+                // Nota: Em um ambiente real, você precisaria de uma função de limpeza
+                // Por enquanto, apenas limpar o localStorage
+                localStorage.removeItem('exercicio_1_TESTE001');
+                localStorage.removeItem('exercicio_1_TESTE002');
+                
+                adicionarResultado('sucesso', '✅ Dados de teste limpos do localStorage');
+                adicionarResultado('info', '⚠️ Nota: Dados do Supabase precisam ser limpos manualmente');
+                
+            } catch (error) {
+                adicionarResultado('erro', `❌ Erro ao limpar dados: ${error.message}`);
+            }
+        }
+
+        // Inicializar
+        adicionarResultado('info', '🚀 Sistema de teste inicializado. Clique nos botões para testar.');
+    </script>
+</body>
+</html>
