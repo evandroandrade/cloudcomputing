@@ -314,14 +314,20 @@ async function loadExerciciosConfig() {
         console.log('🔄 Usando configuração local como fallback...');
         
         // Fallback para configuração local
-        // Fallback com as mesmas datas do exercicios.json (todos liberados para turma 2026)
+        // Fallback com as mesmas datas do exercicios.json
         exerciciosConfig = {
-            exercicios: [1,2,3,4,5,6,7,8,9,10].map(id => ({
-                id,
-                titulo: `Exercício ${id}`,
-                data_liberacao:    "2026-09-14T08:00:00Z",
-                data_ultima_edicao: "2026-12-20T23:59:59Z"
-            }))
+            exercicios: [
+                { id: 1, titulo: 'Exercício 1', data_liberacao: '2026-09-14T08:00:00Z', data_ultima_edicao: '2026-12-20T23:59:59Z' },
+                { id: 2, titulo: 'Exercício 2', data_liberacao: '2026-09-14T08:00:00Z', data_ultima_edicao: '2026-12-20T23:59:59Z' },
+                { id: 3, titulo: 'Exercício 3', data_liberacao: '2026-09-14T08:00:00Z', data_ultima_edicao: '2026-12-20T23:59:59Z' },
+                { id: 4, titulo: 'Exercício 4', data_liberacao: '2026-10-10T08:00:00Z', data_ultima_edicao: '2026-12-20T23:59:59Z' },
+                { id: 5, titulo: 'Exercício 5', data_liberacao: '2026-10-10T08:00:00Z', data_ultima_edicao: '2026-12-20T23:59:59Z' },
+                { id: 6, titulo: 'Exercício 6', data_liberacao: '2026-10-10T08:00:00Z', data_ultima_edicao: '2026-12-20T23:59:59Z' },
+                { id: 7, titulo: 'Exercício 7', data_liberacao: '2026-10-10T08:00:00Z', data_ultima_edicao: '2026-12-20T23:59:59Z' },
+                { id: 8, titulo: 'Exercício 8', data_liberacao: '2026-10-10T08:00:00Z', data_ultima_edicao: '2026-12-20T23:59:59Z' },
+                { id: 9, titulo: 'Exercício 9', data_liberacao: '2026-10-10T08:00:00Z', data_ultima_edicao: '2026-12-20T23:59:59Z' },
+                { id: 10, titulo: 'Exercício 10', data_liberacao: '2026-10-10T08:00:00Z', data_ultima_edicao: '2026-12-20T23:59:59Z' }
+            ]
         };
         
         console.log('✅ Configuração local carregada como fallback');
