@@ -1353,7 +1353,7 @@ async function fazerLoginGlobal() {
     const senhaEl     = document.getElementById('global-senha');
 
     const matricula = matriculaEl ? matriculaEl.value.trim() : '';
-    const senha     = senhaEl     ? senhaEl.value            : '';
+    const senha     = senhaEl     ? senhaEl.value.trim()    : '';
 
     if (!matricula || !senha) {
         showErrorMessage('Preencha matrícula e senha.');

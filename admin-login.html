@@ -195,7 +195,7 @@
         event.preventDefault();
 
         const matricula = document.getElementById('admin-matricula').value.trim();
-        const senha     = document.getElementById('admin-senha').value;
+        const senha     = document.getElementById('admin-senha').value.trim();
 
         if (!matricula || !senha) {
             showError('Preencha matrícula e senha.');
