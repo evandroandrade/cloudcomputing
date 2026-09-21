@@ -12,25 +12,13 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Deploy via FTP para HostGator
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Deploy via FTP — força upload total
+        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
         with:
-          server: ftp.evandroandrade.com
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /public_html/cloudcomputing/
-          dangerous-clean-slate: true
-          log-level: verbose
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/migrations/**
-            **/scripts/**
-            **/supabase/**
-            **/*.bat
-            **/MIGRACAO_AUTH.md
-            **/teste-*.html
-            **/test-*.html
-            **/.env*
-            **/.ftp-deploy-sync-state.json
+          ftp_host: ftp.evandroandrade.com
+          ftp_username: ${{ secrets.FTP_USERNAME }}
+          ftp_password: ${{ secrets.FTP_PASSWORD }}
+          local_source_dir: "."
+          dist_target_dir: "/public_html/cloudcomputing"
+          delete: "true"
+          exclude: "^(.git|node_modules|migrations|scripts|supabase|\.env|.*\.bat|MIGRACAO_AUTH\.md|teste-.*\.html|test-.*\.html|.*\.md|package.*\.json)$"
