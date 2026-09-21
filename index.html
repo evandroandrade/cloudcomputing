@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Cloud Computing</title>
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="57x57" href="apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Global com Login -->
+    <header class="global-header">
+        <div class="header-container">
+            <div class="header-logo">
+                <h1><i class="fas fa-cloud"></i> Cloud Computing Guide</h1>
+            </div>
+            
+            <!-- Sistema de Login Global -->
+            <div class="header-login" id="header-login">
+                <!-- Estado não logado -->
+                <div class="login-form-global" id="login-form-global">
+                    <input type="text" id="global-matricula" placeholder="Matrícula" class="login-input" maxlength="20">
+                    <input type="password" id="global-senha" placeholder="Senha" class="login-input" maxlength="255">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="fazerLoginGlobal()">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </button>
+                    <button type="button" class="btn btn-link btn-sm" onclick="mostrarModalLembrarSenhaGlobal()" style="font-size:0.78rem;color:#9ca3af;background:none;border:none;cursor:pointer;padding:0;">
+                        Esqueceu a senha?
+                    </button>
+                </div>
+                
+                <!-- Estado logado -->
+                <div class="user-info-global" id="user-info-global" style="display: none;">
+                    <span class="user-name" id="global-user-name"></span>
+                    <span class="user-matricula" id="global-user-matricula"></span>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="fazerLogoutGlobal()">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section removida - texto não necessário -->
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="gradient-text">Guia Completo</span><br>
+                    de Cloud Computing
+                </h1>
+                <p class="hero-subtitle">
+                    Domine as principais práticas de nuvem com links oficiais verificados para 
+                    <strong>Huawei Cloud</strong>, <strong>AWS</strong> e <strong>Oracle Cloud</strong>
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">10</span>
+                        <span class="stat-label">Práticas</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">3</span>
+                        <span class="stat-label">Provedores</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">30+</span>
+                        <span class="stat-label">Horas</span>
+                    </div>
+                </div>
+                <div class="hero-buttons">
+                    <a href="#practices" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i>
+                        Começar Agora
+                    </a>
+                    <a href="#resources" class="btn btn-secondary">
+                        <i class="fas fa-book"></i>
+                        Ver Recursos
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="cloud-icons">
+                    <div class="cloud-icon huawei">
+                        <i class="fas fa-server"></i>
+                        <span>Huawei</span>
+                    </div>
+                    <div class="cloud-icon aws">
+                        <i class="fab fa-aws"></i>
+                        <span>AWS</span>
+                    </div>
+                    <div class="cloud-icon oracle">
+                        <i class="fas fa-database"></i>
+                        <span>Oracle</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Practices Section -->
+    <section id="practices" class="practices">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">10 Práticas Essenciais</h2>
+                <p class="section-subtitle">
+                    Cada prática inclui documentação oficial, vídeos sugeridos e estratégias de pesquisa
+                </p>
+            </div>
+            
+            <div class="practices-grid">
+                <div class="practice-card" data-practice="1">
+                    <div class="practice-header">
+                        <div class="practice-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <h3 class="practice-title">Provisionamento de Redes</h3>
+                    </div>
+                    <p class="practice-description">
+                        Isolar recursos em uma rede virtual privada (VPC/VCN)
+                    </p>
+                    <div class="practice-dates">
+                        <div class="date-info">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="date-label">Liberado em:</span>
+                            <span class="date-value" id="liberacao-1">Carregando...</span>
+                        </div>
+                        <div class="date-info">
+                            <i class="fas fa-edit"></i>
+                            <span class="date-label">Editar até:</span>
+                            <span class="date-value" id="edicao-1">Carregando...</span>
+                        </div>
+                    </div>
+                    <div class="practice-time">
+                        <i class="fas fa-clock"></i>
+                        <span>3-4 horas</span>
+                    </div>
+                    <button class="practice-btn" onclick="openPracticeModal(1)">
+                        Ver Detalhes
+                    </button>
+                    <button class="exercicio-btn" onclick="openExercicioModal(1)" id="exercicio-btn-1">
+                        Vamos na Prática!
+                    </button>
+                </div>
+
+                <div class="practice-card" data-practice="2">
+                    <div class="practice-header">
+                        <div class="practice-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <h3 class="practice-title">Instâncias de Computação</h3>
+                    </div>
+                    <p class="practice-description">
+                        Criar e configurar servidores virtuais
+                    </p>
+                    <div class="practice-dates">
+                        <div class="date-info">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="date-label">Liberado em:</span>
+                            <span class="date-value" id="liberacao-2">Carregando...</span>
+                        </div>
+                        <div class="date-info">
+                            <i class="fas fa-edit"></i>
+                            <span class="date-label">Editar até:</span>
+                            <span class="date-value" id="edicao-2">Carregando...</span>
+                        </div>
+                    </div>
+                    <div class="practice-time">
+                        <i class="fas fa-clock"></i>
+                        <span>2-3 horas</span>
+                    </div>
+                    <button class="practice-btn" onclick="openPracticeModal(2)">
+                        Ver Detalhes
+                    </button>
+                    <button class="exercicio-btn" onclick="openExercicioModal(2)" id="exercicio-btn-2">
+                        Vamos na Prática!
+                    </button>
+                </div>
+
+                <div class="practice-card" data-practice="3">
+                    <div class="practice-header">
+                        <div class="practice-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3 class="practice-title">Banco de Dados Gerenciado</h3>
+                    </div>
+                    <p class="practice-description">
+                        Provisionar e utilizar bancos de dados como serviço
+                    </p>
+                    <div class="practice-dates">
+                        <div class="date-info">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="date-label">Liberado em:</span>
+                            <span class="date-value" id="liberacao-3">Carregando...</span>
+                        </div>
+                        <div class="date-info">
+                            <i class="fas fa-edit"></i>
+                            <span class="date-label">Editar até:</span>
+                            <span class="date-value" id="edicao-3">Carregando...</span>
+                        </div>
+                    </div>
+                    <div class="practice-time">
+                        <i class="fas fa-clock"></i>
+                        <span>3-4 horas</span>
+                    </div>
+                    <button class="practice-btn" onclick="openPracticeModal(3)">
+                        Ver Detalhes
+                    </button>
+                    <button class="exercicio-btn" onclick="openExercicioModal(3)" id="exercicio-btn-3">
+                        Vamos na Prática!
+                    </button>
+                </div>
+
+                <div class="practice-card" data-practice="4">
+                    <div class="practice-header">
+                        <div class="practice-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h3 class="practice-title">Balanceamento de Carga</h3>
+                    </div>
+                    <p class="practice-description">
+                        Distribuir o tráfego de rede entre múltiplos servidores
+                    </p>
+                    <div class="practice-dates">
+                        <div class="date-info">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="date-label">Liberado em:</span>
+                            <span class="date-value" id="liberacao-4">Carregando...</span>
+                        </div>
+                        <div class="date-info">
+                            <i class="fas fa-edit"></i>
+                            <span class="date-label">Editar até:</span>
+                            <span class="date-value" id="edicao-4">Carregando...</span>
+                        </div>
+                    </div>
+                    <div class="practice-time">
+                        <i class="fas fa-clock"></i>
+                        <span>2-3 horas</span>
+                    </div>
+                    <button class="practice-btn" onclick="openPracticeModal(4)">
+                        Ver Detalhes
+                    </button>
+                    <button class="exercicio-btn" onclick="openExercicioModal(4)" id="exercicio-btn-4">
+                        Vamos na Prática!
+                    </button>
+                </div>
+
+                <div class="practice-card" data-practice="5">
+                    <div class="practice-header">
+                        <div class="practice-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="practice-title">Auto Scaling</h3>
+                    </div>
+                    <p class="practice-description">
+                        Adicionar ou remover servidores automaticamente
+                    </p>
+                    <div class="practice-dates">
+                        <div class="date-info">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="date-label">Liberado em:</span>
+                            <span class="date-value" id="liberacao-5">Carregando...</span>
+                        </div>
+                        <div class="date-info">
+                            <i class="fas fa-edit"></i>
+                            <span class="date-label">Editar até:</span>
+                            <span class="date-value" id="edicao-5">Carregando...</span>
+                        </div>
+                    </div>
+                    <div class="practice-time">
+                        <i class="fas fa-clock"></i>
+                        <span>2-3 horas</span>
+                    </div>
+                    <button class="practice-btn" onclick="openPracticeModal(5)">
+                        Ver Detalhes
+                    </button>
+                    <button class="exercicio-btn" onclick="openExercicioModal(5)" id="exercicio-btn-5">
+                        Vamos na Prática!
+                    </button>
+                </div>
+
+                <div class="practice-card" data-practice="6">
+                    <div class="practice-header">
+                        <div class="practice-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h3 class="practice-title">Gestão de Identidades</h3>
+                    </div>
+                    <p class="practice-description">
+                        Controlar acessos e proteger dados com chaves
+                    </p>
+                    <div class="practice-dates">
+                        <div class="date-info">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="date-label">Liberado em:</span>
+                            <span class="date-value" id="liberacao-6">Carregando...</span>
+                        </div>
+                        <div class="date-info">
+                            <i class="fas fa-edit"></i>
+                            <span class="date-label">Editar até:</span>
+                            <span class="date-value" id="edicao-6">Carregando...</span>
+                        </div>
+                    </div>
+                    <div class="practice-time">
+                        <i class="fas fa-clock"></i>
+                        <span>3-4 horas</span>
+                    </div>
+                    <button class="practice-btn" onclick="openPracticeModal(6)">
+                        Ver Detalhes
+                    </button>
+                    <button class="exercicio-btn" onclick="openExercicioModal(6)" id="exercicio-btn-6">
+                        Vamos na Prática!
+                    </button>
+                </div>
+
+                <div class="practice-card" data-practice="7">
+                    <div class="practice-header">
+                        <div class="practice-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3 class="practice-title">Monitoramento e Alertas</h3>
+                    </div>
+                    <p class="practice-description">
+                        Observar a saúde dos recursos e criar alarmes
+                    </p>
+                    <div class="practice-dates">
+                        <div class="date-info">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="date-label">Liberado em:</span>
+                            <span class="date-value" id="liberacao-7">Carregando...</span>
+                        </div>
+                        <div class="date-info">
+                            <i class="fas fa-edit"></i>
+                            <span class="date-label">Editar até:</span>
+                            <span class="date-value" id="edicao-7">Carregando...</span>
+                        </div>
+                    </div>
+                    <div class="practice-time">
+                        <i class="fas fa-clock"></i>
+                        <span>2-3 horas</span>
+                    </div>
+                    <button class="practice-btn" onclick="openPracticeModal(7)">
+                        Ver Detalhes
+                    </button>
+                    <button class="exercicio-btn" onclick="openExercicioModal(7)" id="exercicio-btn-7">
+                        Vamos na Prática!
+                    </button>
+                </div>
+
+                <div class="practice-card" data-practice="8">
+                    <div class="practice-header">
+                        <div class="practice-icon">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <h3 class="practice-title">Pipeline e Contêineres</h3>
+                    </div>
+                    <p class="practice-description">
+                        Automatizar a implantação de aplicações
+                    </p>
+                    <div class="practice-dates">
+                        <div class="date-info">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="date-label">Liberado em:</span>
+                            <span class="date-value" id="liberacao-8">Carregando...</span>
+                        </div>
+                        <div class="date-info">
+                            <i class="fas fa-edit"></i>
+                            <span class="date-label">Editar até:</span>
+                            <span class="date-value" id="edicao-8">Carregando...</span>
+                        </div>
+                    </div>
+                    <div class="practice-time">
+                        <i class="fas fa-clock"></i>
+                        <span>4-5 horas</span>
+                    </div>
+                    <button class="practice-btn" onclick="openPracticeModal(8)">
+                        Ver Detalhes
+                    </button>
+                    <button class="exercicio-btn" onclick="openExercicioModal(8)" id="exercicio-btn-8">
+                        Vamos na Prática!
+                    </button>
+                </div>
+
+                <div class="practice-card" data-practice="9">
+                    <div class="practice-header">
+                        <div class="practice-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="practice-title">Resiliência e Backup</h3>
+                    </div>
+                    <p class="practice-description">
+                        Garantir a continuidade e a recuperação de dados
+                    </p>
+                    <div class="practice-dates">
+                        <div class="date-info">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="date-label">Liberado em:</span>
+                            <span class="date-value" id="liberacao-9">Carregando...</span>
+                        </div>
+                        <div class="date-info">
+                            <i class="fas fa-edit"></i>
+                            <span class="date-label">Editar até:</span>
+                            <span class="date-value" id="edicao-9">Carregando...</span>
+                        </div>
+                    </div>
+                    <div class="practice-time">
+                        <i class="fas fa-clock"></i>
+                        <span>2-3 horas</span>
+                    </div>
+                    <button class="practice-btn" onclick="openPracticeModal(9)">
+                        Ver Detalhes
+                    </button>
+                    <button class="exercicio-btn" onclick="openExercicioModal(9)" id="exercicio-btn-9">
+                        Vamos na Prática!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Providers Section -->
+    <section id="providers" class="providers">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Provedores de Nuvem</h2>
+                <p class="section-subtitle">
+                    Compare os principais provedores com links oficiais verificados
+                </p>
+            </div>
+            
+            <div class="providers-grid">
+                <div class="provider-card huawei">
+                    <div class="provider-header">
+                        <div class="provider-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <h3>Huawei Cloud</h3>
+                    </div>
+                    <div class="provider-features">
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Preços competitivos</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Forte presença na Ásia</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Tecnologia 5G integrada</span>
+                        </div>
+                    </div>
+                    <div class="provider-links">
+                        <a href="https://support.huaweicloud.com/intl/en-us/" target="_blank" class="provider-link">
+                            <i class="fas fa-book"></i>
+                            Documentação
+                        </a>
+                        <a href="https://www.huaweicloud.com/intl/en-us/free/" target="_blank" class="provider-link">
+                            <i class="fas fa-gift"></i>
+                            Free Trial
+                        </a>
+                    </div>
+                </div>
+
+                <div class="provider-card aws">
+                    <div class="provider-header">
+                        <div class="provider-icon">
+                            <i class="fab fa-aws"></i>
+                        </div>
+                        <h3>Amazon AWS</h3>
+                    </div>
+                    <div class="provider-features">
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Líder de mercado</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Maior ecossistema</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Mais regiões globais</span>
+                        </div>
+                    </div>
+                    <div class="provider-links">
+                        <a href="https://docs.aws.amazon.com/" target="_blank" class="provider-link">
+                            <i class="fas fa-book"></i>
+                            Documentação
+                        </a>
+                        <a href="https://aws.amazon.com/free/" target="_blank" class="provider-link">
+                            <i class="fas fa-gift"></i>
+                            Free Tier
+                        </a>
+                    </div>
+                </div>
+
+                <div class="provider-card oracle">
+                    <div class="provider-header">
+                        <div class="provider-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3>Oracle Cloud</h3>
+                    </div>
+                    <div class="provider-features">
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Especialista em bancos</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Always Free Tier</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check"></i>
+                            <span>Autonomous Database</span>
+                        </div>
+                    </div>
+                    <div class="provider-links">
+                        <a href="https://docs.oracle.com/en-us/iaas/" target="_blank" class="provider-link">
+                            <i class="fas fa-book"></i>
+                            Documentação
+                        </a>
+                        <a href="https://www.oracle.com/cloud/free/" target="_blank" class="provider-link">
+                            <i class="fas fa-gift"></i>
+                            Free Tier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="resources">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Recursos Adicionais</h2>
+                <p class="section-subtitle">
+                    Ferramentas e estratégias para maximizar seu aprendizado
+                </p>
+            </div>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Estratégias de Pesquisa</h3>
+                    <p>Aprenda como encontrar conteúdo atualizado e confiável sobre cloud computing</p>
+                    <ul class="resource-list">
+                        <li>Filtros do YouTube para conteúdo atual</li>
+                        <li>Navegação na documentação oficial</li>
+                        <li>Canais e fontes confiáveis</li>
+                    </ul>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Vídeos Recomendados</h3>
+                    <p>Termos de busca específicos para encontrar os melhores tutoriais</p>
+                    <ul class="resource-list">
+                        <li>Conceitos fundamentais</li>
+                        <li>Tutoriais práticos por provedor</li>
+                        <li>Comparações técnicas</li>
+                    </ul>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3>Documentação Oficial</h3>
+                    <p>Links diretos para as seções mais importantes de cada provedor</p>
+                    <ul class="resource-list">
+                        <li>Getting Started guides</li>
+                        <li>Best practices</li>
+                        <li>API references</li>
+                    </ul>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Comparações Técnicas</h3>
+                    <p>Tabelas detalhadas comparando recursos e preços</p>
+                    <ul class="resource-list">
+                        <li>Especificações técnicas</li>
+                        <li>Modelos de preços</li>
+                        <li>Limitações e quotas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Pronto para começar sua jornada na nuvem?</h2>
+                <p class="cta-subtitle">
+                    Baixe o guia completo em PDF e comece suas práticas hoje mesmo
+                </p>
+                <div class="cta-buttons">
+                    <a href="#practices" class="btn btn-secondary">
+                        <i class="fas fa-arrow-up"></i>
+                        Ver Práticas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-cloud"></i>
+                        <span>Cloud Guide</span>
+                    </div>
+                    <p>Guia completo para dominar as principais práticas de Cloud Computing</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Práticas</h4>
+                    <ul>
+                        <li><a href="#practices">Redes</a></li>
+                        <li><a href="#practices">Computação</a></li>
+                        <li><a href="#practices">Banco de Dados</a></li>
+                        <li><a href="#practices">Monitoramento</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Provedores</h4>
+                    <ul>
+                        <li><a href="#providers">Huawei Cloud</a></li>
+                        <li><a href="#providers">Amazon AWS</a></li>
+                        <li><a href="#providers">Oracle Cloud</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="#resources">Documentação</a></li>
+                        <li><a href="#resources">Vídeos</a></li>
+                        <li><a href="#resources">Comparações</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Cloud Guide. Criado para fins educacionais.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Practice Modal -->
+    <div id="practiceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Prática</h2>
+                <span class="close" onclick="closePracticeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Exercício Modal -->
+    <div id="exercicioModal" class="modal">
+        <div class="modal-content exercicio-modal">
+            <div class="modal-header">
+                <h2 id="exercicioModalTitle">Exercício Prático</h2>
+                <span class="close" onclick="closeExercicioModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="exercicioModalBody">
+                <!-- Formulário do exercício será carregado dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase JS v2 — deve ser carregado ANTES de config/supabase.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+    <!-- Scripts de Segurança (carregar primeiro) -->
+    <script src="js/security.js"></script>
+    
+    <!-- Configuração do Supabase (carregar antes dos scripts principais) -->
+    <script src="config/supabase.js"></script>
+    
+    <!-- Scripts principais -->
+    <script src="js/secure-auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

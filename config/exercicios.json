@@ -1,0 +1,74 @@
+{
+  "exercicios": [
+    {
+      "id": 1,
+      "titulo": "Exercício 1 - Provisionamento de Redes",
+      "data_liberacao": "2026-09-14T08:00:00Z",
+      "data_ultima_edicao": "2026-12-20T23:59:59Z",
+      "descricao": "Isolar recursos em uma rede virtual privada (VPC/VCN)"
+    },
+    {
+      "id": 2,
+      "titulo": "Exercício 2 - Instâncias de Computação",
+      "data_liberacao": "2026-09-14T08:00:00Z",
+      "data_ultima_edicao": "2026-12-20T23:59:59Z",
+      "descricao": "Criar e configurar servidores virtuais"
+    },
+    {
+      "id": 3,
+      "titulo": "Exercício 3 - Banco de Dados Gerenciado",
+      "data_liberacao": "2026-09-14T08:00:00Z",
+      "data_ultima_edicao": "2026-12-20T23:59:59Z",
+      "descricao": "Provisionar e utilizar bancos de dados como serviço"
+    },
+    {
+      "id": 4,
+      "titulo": "Exercício 4 - Balanceamento de Carga",
+      "data_liberacao": "2026-09-14T08:00:00Z",
+      "data_ultima_edicao": "2026-12-20T23:59:59Z",
+      "descricao": "Distribuir o tráfego de rede entre múltiplos servidores"
+    },
+    {
+      "id": 5,
+      "titulo": "Exercício 5 - Auto Scaling",
+      "data_liberacao": "2026-09-14T08:00:00Z",
+      "data_ultima_edicao": "2026-12-20T23:59:59Z",
+      "descricao": "Adicionar ou remover servidores automaticamente"
+    },
+    {
+      "id": 6,
+      "titulo": "Exercício 6 - Gestão de Identidades",
+      "data_liberacao": "2026-09-14T08:00:00Z",
+      "data_ultima_edicao": "2026-12-20T23:59:59Z",
+      "descricao": "Controlar acessos e proteger dados com chaves"
+    },
+    {
+      "id": 7,
+      "titulo": "Exercício 7 - Monitoramento e Alertas",
+      "data_liberacao": "2026-09-14T08:00:00Z",
+      "data_ultima_edicao": "2026-12-20T23:59:59Z",
+      "descricao": "Observar a saúde dos recursos e criar alarmes"
+    },
+    {
+      "id": 8,
+      "titulo": "Exercício 8 - Pipeline e Contêineres",
+      "data_liberacao": "2026-09-14T08:00:00Z",
+      "data_ultima_edicao": "2026-12-20T23:59:59Z",
+      "descricao": "Automatizar a implantação de aplicações"
+    },
+    {
+      "id": 9,
+      "titulo": "Exercício 9 - Resiliência e Backup",
+      "data_liberacao": "2026-09-14T08:00:00Z",
+      "data_ultima_edicao": "2026-12-20T23:59:59Z",
+      "descricao": "Garantir a continuidade e a recuperação de dados"
+    },
+    {
+      "id": 10,
+      "titulo": "Exercício 10 - Integração Final",
+      "data_liberacao": "2026-09-14T08:00:00Z",
+      "data_ultima_edicao": "2026-12-20T23:59:59Z",
+      "descricao": "Integrar e documentar a arquitetura cloud completa"
+    }
+  ]
+}

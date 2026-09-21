@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Administrativo - Cloud Computing</title>
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="57x57" href="apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e40af">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --admin-primary: #1e40af;
+            --admin-secondary: #3b82f6;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--admin-primary), var(--admin-secondary));
+        }
+
+        .login-header { text-align: center; margin-bottom: 2rem; }
+        .login-header h1 { color: var(--admin-primary); margin-bottom: 0.5rem; font-size: 1.8rem; }
+        .login-header p { color: #666; margin: 0; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; }
+        .form-group input {
+            width: 100%; padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb; border-radius: 0.5rem;
+            font-size: 1rem; transition: all 0.3s ease; box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none; border-color: var(--admin-primary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
+        .btn-login {
+            width: 100%; padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
+            color: white; border: none; border-radius: 0.5rem;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59,130,246,0.3); }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .alert {
+            padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem;
+            display: none; font-size: 0.9rem;
+        }
+        .alert-error { background: #fee2e2; color: #991b1b; }
+        .alert-success { background: #d1fae5; color: #065f46; }
+
+        .security-notice {
+            background: #fef3c7; color: #92400e;
+            padding: 0.75rem 1rem; border-radius: 0.5rem;
+            margin-bottom: 1.5rem; font-size: 0.85rem;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .back-link { text-align: center; margin-top: 2rem; }
+        .back-link a { color: #6b7280; text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+        .back-link a:hover { color: var(--admin-primary); }
+
+        @media (max-width: 480px) {
+            .login-container { padding: 2rem; }
+            .login-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1><i class="fas fa-shield-alt"></i> Acesso Administrativo</h1>
+            <p>Painel de administração — Cloud Computing</p>
+        </div>
+
+        <div class="security-notice">
+            <i class="fas fa-lock"></i>
+            <strong>Acesso Restrito:</strong> Apenas administradores autorizados.
+        </div>
+
+        <div class="alert alert-error" id="alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="error-text"></span>
+        </div>
+
+        <div class="alert alert-success" id="alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span id="success-text"></span>
+        </div>
+
+        <form id="admin-login-form" onsubmit="fazerLoginAdmin(event)">
+            <div class="form-group">
+                <label for="admin-matricula"><i class="fas fa-user"></i> Matrícula</label>
+                <input type="text" id="admin-matricula" required maxlength="20"
+                       placeholder="Digite sua matrícula" autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="admin-senha"><i class="fas fa-lock"></i> Senha</label>
+                <input type="password" id="admin-senha" required maxlength="255"
+                       placeholder="Digite sua senha" autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn-login" id="login-btn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span id="login-btn-text">Entrar</span>
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="index.html"><i class="fas fa-arrow-left"></i> Voltar ao site principal</a>
+        </div>
+    </div>
+
+    <!-- Supabase JS v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <!-- Módulos de segurança -->
+    <script src="js/security.js"></script>
+    <script src="config/supabase.js"></script>
+    <script src="js/secure-auth.js"></script>
+
+    <script>
+    // =============================================================================
+    // admin-login.html — Autenticação via Supabase Auth
+    // NUNCA compara senha no JavaScript.
+    // NUNCA usa localStorage como prova de autenticação.
+    // =============================================================================
+
+    const alertError   = document.getElementById('alert-error');
+    const alertSuccess = document.getElementById('alert-success');
+    const errorText    = document.getElementById('error-text');
+    const successText  = document.getElementById('success-text');
+    const loginBtn     = document.getElementById('login-btn');
+    const loginBtnText = document.getElementById('login-btn-text');
+
+    function showError(msg) {
+        errorText.textContent = msg;
+        alertError.style.display = 'block';
+        alertSuccess.style.display = 'none';
+    }
+
+    function showSuccess(msg) {
+        successText.textContent = msg;
+        alertSuccess.style.display = 'block';
+        alertError.style.display = 'none';
+    }
+
+    function setLoading(loading) {
+        loginBtn.disabled = loading;
+        loginBtnText.textContent = loading ? 'Verificando...' : 'Entrar';
+    }
+
+    async function fazerLoginAdmin(event) {
+        event.preventDefault();
+
+        const matricula = document.getElementById('admin-matricula').value.trim();
+        const senha     = document.getElementById('admin-senha').value;
+
+        if (!matricula || !senha) {
+            showError('Preencha matrícula e senha.');
+            return;
+        }
+
+        setLoading(true);
+        alertError.style.display = 'none';
+
+        try {
+            // 1. Autenticar via Supabase Auth (email técnico determinístico)
+            const resultado = await window.SecureAuth.loginComMatricula(matricula, senha);
+
+            if (!resultado.success) {
+                // Limpar senha do DOM imediatamente
+                document.getElementById('admin-senha').value = '';
+                showError('Matrícula ou senha inválida.');
+                setLoading(false);
+                return;
+            }
+
+            const perfil = resultado.data;
+
+            // Limpar campos após autenticação
+            document.getElementById('admin-matricula').value = '';
+            document.getElementById('admin-senha').value = '';
+
+            // 2. Verificar se é primeiro login (admin deve ter trocado antes)
+            if (perfil.primeiro_login === true) {
+                // Admin ainda no primeiro login — redirecionar para troca de senha
+                // Como não temos a página de troca no admin, deslogar e orientar
+                await window.SecureAuth.logoutSeguro();
+                showError('Você deve redefinir sua senha antes de acessar o painel. Contate o suporte.');
+                setLoading(false);
+                return;
+            }
+
+            // 3. Verificar se realmente é admin (RLS valida no banco; verificamos aqui para UX)
+            if (perfil.tipo_usuario !== 'admin' || perfil.desabilitado === true) {
+                await window.SecureAuth.logoutSeguro();
+                showError('Acesso negado. Esta área é restrita a administradores.');
+                setLoading(false);
+                return;
+            }
+
+            // 4. Sucesso — redirecionar
+            showSuccess(`Bem-vindo, ${perfil.nome}! Redirecionando...`);
+
+            setTimeout(() => {
+                window.location.href = 'admin.html';
+            }, 800);
+
+        } catch (err) {
+            console.warn('[admin-login] Erro inesperado no login.');
+            showError('Erro ao fazer login. Tente novamente.');
+            document.getElementById('admin-senha').value = '';
+            setLoading(false);
+        }
+    }
+
+    // Verificar se já há sessão admin ativa ao carregar
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Limpar qualquer sessão legada
+        if (window.Security) window.Security.limparSessaoLegada();
+
+        // Verificar sessão Supabase Auth ativa
+        if (window.supabaseClient) {
+            try {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                if (session) {
+                    // Buscar perfil para confirmar admin
+                    const perfilResult = await window.SecureAuth.buscarPerfilAtual();
+                    if (perfilResult.success && perfilResult.data) {
+                        const p = perfilResult.data;
+                        if (p.tipo_usuario === 'admin' && !p.desabilitado && !p.primeiro_login) {
+                            // Sessão admin válida — redirecionar direto
+                            window.location.href = 'admin.html';
+                            return;
+                        }
+                    }
+                }
+            } catch { /* ignora */ }
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+name: Deploy para HostGator
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Deploy via FTP para HostGator
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ftp.evandroandrade.com
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /public_html/cloudcomputing/
+          # Não subir arquivos sensíveis
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/migrations/**
+            **/scripts/**
+            **/supabase/**
+            **/*.bat
+            **/MIGRACAO_AUTH.md
+            **/teste-*.html
+            **/test-*.html
+            **/.env*

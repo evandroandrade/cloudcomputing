@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Administração - Cloud Computing</title>
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="57x57" href="apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --admin-primary: #1e40af;
+            --admin-secondary: #3b82f6;
+            --admin-success: #059669;
+            --admin-warning: #d97706;
+            --admin-danger: #dc2626;
+            --admin-info: #0891b2;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
+            border-radius: 1rem;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .admin-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--admin-primary);
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dashboard-card h3 {
+            color: var(--admin-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dashboard-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--admin-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dashboard-card .label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Tabs de Navegação */
+        .admin-tabs {
+            display: flex;
+            background: white;
+            border-radius: 1rem;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-button.active {
+            background: var(--admin-primary);
+            color: white;
+        }
+
+        .tab-button:hover:not(.active) {
+            background: #f3f4f6;
+        }
+
+        /* Conteúdo das Tabs */
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Gestão de Alunos */
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .student-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .student-card:hover {
+            border-color: var(--admin-primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .student-matricula {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .student-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-group .btn-action {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .btn-reset {
+            background: var(--admin-warning);
+            color: white;
+        }
+        
+        .btn-edit {
+            background: var(--admin-info);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--admin-danger);
+            color: white;
+        }
+
+        /* Formulários */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--admin-primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--admin-success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--admin-warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--admin-danger);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Estilos para campos específicos */
+        .campos-especificos {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .campos-especificos h4 {
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+            font-size: 1.1rem;
+        }
+        
+        .campo-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .campo-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .campo-item strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+        
+        .campo-resposta {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            min-height: 3rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #4b5563;
+        }
+        
+        .campo-resposta:empty::before {
+            content: "N/A";
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        /* Modais */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--admin-primary);
+        }
+        
+        .modal-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        /* Tabelas */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .admin-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .admin-table tr:hover {
+            background: #f9fafb;
+        }
+
+        /* Gráficos */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            color: var(--admin-primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .admin-header h1 {
+                font-size: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h1><i class="fas fa-chalkboard-teacher"></i> Painel de Administração</h1>
+                    <p>Gerencie alunos, analise exercícios e configure o sistema</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="text-align: right; color: rgba(255,255,255,0.9);">
+                        <div style="font-weight: 600;" id="admin-name">Carregando...</div>
+                        <div style="font-size: 0.9rem;" id="admin-matricula">-</div>
+                    </div>
+                    <button class="btn btn-warning" onclick="fazerLogoutAdmin()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Cards -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3><i class="fas fa-users"></i> Total de Alunos</h3>
+                <div class="number" id="total-alunos">0</div>
+                <div class="label">Cadastrados no sistema</div>
+            </div>
+            <div class="dashboard-card">
+                <h3><i class="fas fa-clipboard-check"></i> Exercícios Entregues</h3>
+                <div class="number" id="total-exercicios">0</div>
+                <div class="label">Respostas submetidas</div>
+            </div>
+            <div class="dashboard-card">
+                <h3><i class="fas fa-chart-line"></i> Taxa de Conclusão</h3>
+                <div class="number" id="taxa-conclusao">0%</div>
+                <div class="label">Média da turma</div>
+            </div>
+            <div class="dashboard-card">
+                <h3><i class="fas fa-clock"></i> Exercícios Ativos</h3>
+                <div class="number" id="exercicios-ativos">0</div>
+                <div class="label">Com prazo válido</div>
+            </div>
+        </div>
+        
+        <!-- Tabs de Navegação -->
+        <div class="admin-tabs">
+            <button class="tab-button active" onclick="showTab('dashboard')">
+                <i class="fas fa-chart-bar"></i> Dashboard
+            </button>
+            <button class="tab-button" onclick="showTab('alunos')">
+                <i class="fas fa-users"></i> Gestão de Alunos
+            </button>
+            <button class="tab-button" onclick="showTab('exercicios')">
+                <i class="fas fa-clipboard-list"></i> Exercícios
+            </button>
+            <button class="tab-button" onclick="showTab('avaliacoes')">
+                <i class="fas fa-star"></i> Avaliações
+            </button>
+            <button class="tab-button" onclick="showTab('configuracoes')">
+                <i class="fas fa-cog"></i> Configurações
+                        </button>
+        </div>
+
+        <!-- Tab Dashboard -->
+        <div id="dashboard" class="tab-content active">
+            <h2><i class="fas fa-chart-bar"></i> Dashboard de Progresso</h2>
+            
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-title">Progresso por Exercício</div>
+                    <canvas id="progressChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Distribuição de Plataformas</div>
+                    <canvas id="platformChart"></canvas>
+                    </div>
+                </div>
+                
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Exercício</th>
+                            <th>Alunos Entregaram</th>
+                            <th>Taxa de Conclusão</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="progress-table">
+                        <!-- Dados serão carregados aqui -->
+                    </tbody>
+                </table>
+                    </div>
+                </div>
+                
+        <!-- Tab Gestão de Alunos -->
+        <div id="alunos" class="tab-content">
+            <h2><i class="fas fa-users"></i> Gestão de Alunos</h2>
+            
+            <div style="margin-bottom: 2rem;">
+                <button class="btn btn-primary" onclick="showAddStudentModal()">
+                    <i class="fas fa-plus"></i> Adicionar Novo Aluno
+                    </button>
+                </div>
+
+            <div class="students-grid" id="students-grid">
+                <!-- Lista de alunos será carregada aqui -->
+            </div>
+        </div>
+        
+        <!-- Tab Exercícios -->
+        <div id="exercicios" class="tab-content">
+            <h2><i class="fas fa-clipboard-list"></i> Gestão de Exercícios</h2>
+            
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Exercício</th>
+                            <th>Data de Liberação</th>
+                            <th>Prazo Final</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exercises-table">
+                        <!-- Dados serão carregados aqui -->
+                    </tbody>
+                </table>
+            </div>
+                </div>
+                
+        <!-- Tab Avaliações -->
+        <div id="avaliacoes" class="tab-content">
+            <h2><i class="fas fa-star"></i> Sistema de Avaliações</h2>
+            
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Exercício</th>
+                            <th>Nota</th>
+                            <th>Comentário</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="grades-table">
+                        <!-- Dados serão carregados aqui -->
+                    </tbody>
+                </table>
+            </div>
+                </div>
+                
+        <!-- Tab Configurações -->
+        <div id="configuracoes" class="tab-content">
+            <h2><i class="fas fa-cog"></i> Configurações do Sistema</h2>
+            
+            <div class="form-group">
+                <label>Data de Início do Semestre:</label>
+                <input type="date" id="semester-start" value="2025-01-01">
+                </div>
+                
+            <div class="form-group">
+                <label>Data de Fim do Semestre:</label>
+                <input type="date" id="semester-end" value="2025-12-31">
+            </div>
+            
+            <div class="form-group">
+                <label>Prazo Padrão para Exercícios (dias):</label>
+                <input type="number" id="default-deadline" value="7" min="1" max="30">
+            </div>
+            
+            <button class="btn btn-primary" onclick="saveConfigurations()">
+                <i class="fas fa-save"></i> Salvar Configurações
+                </button>
+            </div>
+        </div>
+        
+    <!-- Modal Adicionar Aluno -->
+    <div id="addStudentModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Novo Aluno</h3>
+                <span class="close" onclick="closeModal('addStudentModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addStudentForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nome Completo *</label>
+                            <input type="text" id="new-student-name" required maxlength="255">
+                </div>
+                        <div class="form-group">
+                            <label>Matrícula *</label>
+                            <input type="text" id="new-student-matricula" required maxlength="20">
+                </div>
+            </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="new-student-email" maxlength="255">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha Inicial</label>
+                        <input type="text" id="new-student-password" value="123456" readonly maxlength="255">
+                        <small>Senha padrão: 123456 (aluno deve alterar no primeiro login)</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addStudentModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="addNewStudent()">Adicionar Aluno</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Editar Aluno -->
+    <div id="editStudentModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Aluno</h3>
+                <span class="close" onclick="closeModal('editStudentModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editStudentForm">
+                    <input type="hidden" id="edit-student-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nome Completo *</label>
+                            <input type="text" id="edit-student-name" required maxlength="255">
+                        </div>
+                        <div class="form-group">
+                            <label>Matrícula *</label>
+                            <input type="text" id="edit-student-matricula" required maxlength="20">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="edit-student-email" maxlength="255">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('editStudentModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveStudentEdit()">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <!-- Supabase JS v2 — deve ser carregado PRIMEIRO -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="js/security.js"></script>
+    <script src="config/supabase.js"></script>
+    <script src="js/secure-auth.js"></script>
+    <script>
+        // Variáveis globais
+        let allStudents = [];
+        let allExercises = [];
+        let allGrades = [];
+        let adminSession = null;
+
+        // Verificar autenticação de admin via Supabase Auth (JWT real)
+        async function verificarAutenticacaoAdmin() {
+            try {
+                if (!window.supabaseClient) {
+                    redirecionarParaLogin('Sistema indisponível.');
+                    return false;
+                }
+
+                const resultado = await window.SecureAuth.verificarSessaoAdmin();
+
+                if (!resultado.autenticado) {
+                    redirecionarParaLogin('Sessão expirada ou acesso negado.');
+                    return false;
+                }
+
+                adminSession = resultado.perfil;
+                return true;
+
+            } catch (error) {
+                console.warn('[admin.html] Erro ao verificar autenticação.');
+                redirecionarParaLogin('Erro ao verificar autenticação.');
+                return false;
+            }
+        }
+
+        // Redirecionar para login
+        function redirecionarParaLogin(motivo) {
+            if (motivo) console.warn('[admin.html] Acesso negado:', motivo);
+            window.location.href = 'admin-login.html';
+        }
+
+        // Logout seguro
+        async function fazerLogoutAdmin() {
+            if (confirm('Deseja realmente sair do painel administrativo?')) {
+                await window.SecureAuth.logoutSeguro();
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        // Função para mostrar tabs
+        function showTab(tabName) {
+            // Esconder todas as tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar tab selecionada
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Carregar dados específicos da tab
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'alunos':
+                    loadStudentsData();
+                    break;
+                case 'exercicios':
+                    loadExercisesData();
+                    break;
+                case 'avaliacoes':
+                    loadGradesData();
+                    break;
+            }
+        }
+
+        // Carregar dados do dashboard
+        async function loadDashboardData() {
+            try {
+                // Carregar dados básicos
+                await Promise.all([
+                    loadStudentsData(),
+                    loadExercisesData()
+                ]);
+
+                // Atualizar estatísticas
+                updateDashboardStats();
+                
+                // Criar gráficos
+                createProgressChart();
+                createPlatformChart();
+                
+                // Atualizar tabela de progresso
+                updateProgressTable();
+            } catch (error) {
+                console.error('Erro ao carregar dashboard:', error);
+            }
+        }
+
+        // Carregar dados dos alunos via Supabase Auth (RLS admin valida automaticamente)
+        async function loadStudentsData() {
+            try {
+                const result = await window.SecureAuth.listarPerfisAlunos();
+                if (result.success) {
+                    // Não trazer campos de senha — a query no secure-auth.js já os exclui
+                    allStudents = result.data || [];
+                    updateStudentsGrid();
+                } else {
+                    console.error('Erro ao carregar alunos:', result.error);
+                    allStudents = [];
+                }
+            } catch (error) {
+                console.error('Erro ao carregar alunos:', error);
+                allStudents = [];
+            }
+        }
+
+        // Carregar dados dos exercícios
+        async function loadExercisesData() {
+            try {
+                console.log('📊 Carregando dados dos exercícios...');
+                
+                // Usar a função do config/supabase.js
+                const result = await window.listarTodasRespostas();
+                
+                if (result.success) {
+                    allExercises = result.data || [];
+                    console.log(`✅ ${allExercises.length} exercícios carregados`);
+                    updateExercisesTable();
+                } else {
+                    console.error('❌ Erro ao carregar exercícios:', result.error);
+                    allExercises = [];
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar exercícios:', error);
+                allExercises = [];
+            }
+        }
+
+        // Atualizar tabela de exercícios
+        function updateExercisesTable() {
+            const tbody = document.getElementById('exercises-table');
+            tbody.innerHTML = '';
+
+            // Agrupar exercícios por ID
+            const exerciciosAgrupados = {};
+            allExercises.forEach(exercicio => {
+                if (!exerciciosAgrupados[exercicio.exercicio_id]) {
+                    exerciciosAgrupados[exercicio.exercicio_id] = [];
+                }
+                exerciciosAgrupados[exercicio.exercicio_id].push(exercicio);
+            });
+
+            // Criar linhas para cada exercício
+            Object.keys(exerciciosAgrupados).forEach(exercicioId => {
+                const exercicios = exerciciosAgrupados[exercicioId];
+                const totalAlunos = allStudents.length;
+                const alunosEntregaram = exercicios.length;
+                const taxaConclusao = totalAlunos > 0 ? Math.round((alunosEntregaram / totalAlunos) * 100) : 0;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Exercício ${exercicioId}</td>
+                    <td>${alunosEntregaram}/${totalAlunos}</td>
+                    <td>${taxaConclusao}%</td>
+                    <td>
+                        <span class="status-badge ${taxaConclusao >= 80 ? 'success' : taxaConclusao >= 50 ? 'warning' : 'danger'}">
+                            ${taxaConclusao >= 80 ? 'Excelente' : taxaConclusao >= 50 ? 'Bom' : 'Atenção'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn-action btn-primary" onclick="viewExerciseDetails(${exercicioId})">
+                                <i class="fas fa-eye"></i> Ver Detalhes
+                            </button>
+                            <button class="btn-action btn-success" onclick="downloadAllExercisePDFs(${exercicioId})">
+                                <i class="fas fa-download"></i> Baixar Todos PDFs
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Atualizar grid de alunos
+        function updateStudentsGrid() {
+            const grid = document.getElementById('students-grid');
+            grid.innerHTML = '';
+
+            allStudents.forEach(student => {
+                const card = document.createElement('div');
+                card.className = 'student-card';
+                card.innerHTML = `
+                    <div class="student-info">
+                        <div>
+                            <div class="student-name">${student.nome}</div>
+                            <div class="student-matricula">${student.matricula}</div>
+                        </div>
+                    </div>
+                    <div class="student-actions">
+                        <button class="btn-action btn-reset" onclick="resetStudentPassword('${student.matricula}')">
+                            <i class="fas fa-key"></i> Reset Senha
+                        </button>
+                        <button class="btn-action btn-edit" onclick="editStudent('${student.id}')">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn-action ${student.desabilitado ? 'btn-success' : 'btn-delete'}" onclick="deleteStudent('${student.id}')">
+                            <i class="fas fa-${student.desabilitado ? 'user-check' : 'user-slash'}"></i>
+                            ${student.desabilitado ? 'Reativar' : 'Desabilitar'}
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Reset de senha via Edge Function admin-users
+        async function resetStudentPassword(matricula) {
+            const student = allStudents.find(s => s.matricula === matricula);
+            const nome = student ? student.nome : matricula;
+            if (!confirm(`Resetar a senha de "${nome}" para a própria matrícula?\n\nO aluno precisará definir uma nova senha no próximo acesso.`)) return;
+
+            try {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                const resp = await fetch(`${window.SUPABASE_URL}/functions/v1/admin-users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({ action: 'reset_password', matricula })
+                });
+                const resultado = await resp.json();
+                if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
+                alert(`✅ Senha temporária redefinida para a matrícula.\nO aluno deverá alterar no próximo acesso.`);
+                loadStudentsData();
+            } catch (error) {
+                alert('❌ Erro ao resetar senha: ' + error.message);
+            }
+        }
+
+        // Editar aluno
+        function editStudent(studentId) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return;
+
+            document.getElementById('edit-student-id').value = student.id;
+            document.getElementById('edit-student-name').value = student.nome;
+            document.getElementById('edit-student-matricula').value = student.matricula;
+            document.getElementById('edit-student-email').value = student.email || '';
+
+            document.getElementById('editStudentModal').style.display = 'block';
+        }
+
+        // Salvar edição do aluno via Edge Function
+        async function saveStudentEdit() {
+            const studentId = document.getElementById('edit-student-id').value;
+            const nome      = document.getElementById('edit-student-name').value.trim();
+            const email     = document.getElementById('edit-student-email').value.trim();
+
+            if (!nome) { alert('Nome é obrigatório.'); return; }
+
+            // Descobrir auth_user_id do aluno
+            const student = allStudents.find(s => s.id === studentId || s.id === parseInt(studentId));
+            if (!student) { alert('Aluno não encontrado.'); return; }
+
+            try {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                const resp = await fetch(`${window.SUPABASE_URL}/functions/v1/admin-users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        action: 'update_profile',
+                        auth_user_id: student.auth_user_id,
+                        nome,
+                        email
+                    })
+                });
+                const resultado = await resp.json();
+                if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
+
+                alert('✅ Aluno atualizado com sucesso!');
+                closeModal('editStudentModal');
+                loadStudentsData();
+            } catch (error) {
+                alert('❌ Erro ao atualizar aluno: ' + error.message);
+            }
+        }
+
+        // Desabilitar aluno (preserva histórico) via Edge Function
+        async function deleteStudent(studentId) {
+            const student = allStudents.find(s => s.id === studentId || s.id === parseInt(studentId));
+            if (!student) return;
+
+            const estaDesabilitado = student.desabilitado === true;
+            const acao = estaDesabilitado ? 'reativar' : 'desabilitar';
+            const novoEstado = !estaDesabilitado;
+
+            if (!confirm(`Deseja ${acao} o aluno "${student.nome}"?\n\nO histórico e exercícios serão preservados.`)) return;
+
+            try {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                const resp = await fetch(`${window.SUPABASE_URL}/functions/v1/admin-users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        action: 'set_disabled',
+                        auth_user_id: student.auth_user_id,
+                        desabilitado: novoEstado
+                    })
+                });
+                const resultado = await resp.json();
+                if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
+
+                alert(`✅ Aluno ${novoEstado ? 'desabilitado' : 'reativado'} com sucesso!`);
+                loadStudentsData();
+            } catch (error) {
+                alert('❌ Erro ao alterar status: ' + error.message);
+            }
+        }
+
+        // Adicionar novo aluno via Edge Function admin-users
+        async function addNewStudent() {
+            const nome      = document.getElementById('new-student-name').value.trim();
+            const matricula = document.getElementById('new-student-matricula').value.trim();
+            const email     = document.getElementById('new-student-email').value.trim();
+
+            if (!nome || !matricula) {
+                alert('Nome e matrícula são obrigatórios.');
+                return;
+            }
+
+            try {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                const resp = await fetch(`${window.SUPABASE_URL}/functions/v1/admin-users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({ action: 'create', nome, matricula, email })
+                });
+                const resultado = await resp.json();
+                if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
+
+                alert(`✅ Aluno adicionado com sucesso!\nSenha temporária: matrícula (${matricula})\nO aluno será obrigado a trocar no primeiro acesso.`);
+                closeModal('addStudentModal');
+                document.getElementById('addStudentForm').reset();
+                loadStudentsData();
+            } catch (error) {
+                alert('❌ Erro ao adicionar aluno: ' + error.message);
+            }
+        }
+
+        // Funções auxiliares
+        function showAddStudentModal() {
+            document.getElementById('addStudentModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('total-alunos').textContent = allStudents.length;
+            
+            // Calcular estatísticas dos exercícios
+            const totalExercicios = allExercises.length;
+            const totalAlunos = allStudents.length;
+            
+            // Calcular taxa de conclusão média
+            const exerciciosAgrupados = {};
+            allExercises.forEach(exercicio => {
+                if (!exerciciosAgrupados[exercicio.exercicio_id]) {
+                    exerciciosAgrupados[exercicio.exercicio_id] = [];
+                }
+                exerciciosAgrupados[exercicio.exercicio_id].push(exercicio);
+            });
+            
+            let taxaConclusaoTotal = 0;
+            let exerciciosComDados = 0;
+            
+            Object.keys(exerciciosAgrupados).forEach(exercicioId => {
+                const exercicios = exerciciosAgrupados[exercicioId];
+                const taxaConclusao = totalAlunos > 0 ? (exercicios.length / totalAlunos) * 100 : 0;
+                taxaConclusaoTotal += taxaConclusao;
+                exerciciosComDados++;
+            });
+            
+            const taxaConclusaoMedia = exerciciosComDados > 0 ? Math.round(taxaConclusaoTotal / exerciciosComDados) : 0;
+            
+            // Calcular exercícios ativos (com prazo válido)
+            const hoje = new Date();
+            let exerciciosAtivos = 0;
+            
+            // Simular verificação de exercícios ativos (você pode implementar lógica mais específica)
+            exerciciosAtivos = Object.keys(exerciciosAgrupados).length;
+            
+            // Atualizar elementos do dashboard
+            document.getElementById('total-exercicios').textContent = totalExercicios;
+            document.getElementById('taxa-conclusao').textContent = taxaConclusaoMedia + '%';
+            document.getElementById('exercicios-ativos').textContent = exerciciosAtivos;
+        }
+
+        // Visualizar detalhes de um exercício
+        function viewExerciseDetails(exercicioId) {
+            const exerciciosDoExercicio = allExercises.filter(ex => ex.exercicio_id === exercicioId);
+            
+            if (exerciciosDoExercicio.length === 0) {
+                alert('Nenhum exercício encontrado para este ID.');
+                return;
+            }
+            
+            // Criar modal dinâmico para mostrar detalhes
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 90%; max-height: 90%; overflow-y: auto;">
+                    <div class="modal-header">
+                        <h3>Detalhes do Exercício ${exercicioId}</h3>
+                        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Aluno</th>
+                                        <th>Matrícula</th>
+                                        <th>Plataforma</th>
+                                        <th>Objetivo</th>
+                                        <th>Data de Envio</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${exerciciosDoExercicio.map(exercicio => `
+                                        <tr>
+                                            <td>${exercicio.nome || 'N/A'}</td>
+                                            <td>${exercicio.matricula || 'N/A'}</td>
+                                            <td>${exercicio.plataforma || 'N/A'}</td>
+                                            <td>${exercicio.objetivo ? exercicio.objetivo.substring(0, 50) + '...' : 'N/A'}</td>
+                                            <td>${exercicio.created_at ? new Date(exercicio.created_at).toLocaleDateString('pt-BR') : 'N/A'}</td>
+                                            <td>
+                                                <button class="btn-action btn-primary" onclick="viewFullExercise(${exercicio.id})">
+                                                    <i class="fas fa-eye"></i> Ver Completo
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Visualizar exercício completo
+        function viewFullExercise(exercicioId) {
+            const exercicio = allExercises.find(ex => ex.id === exercicioId);
+            
+            if (!exercicio) {
+                alert('Exercício não encontrado.');
+                return;
+            }
+            
+            // Gerar campos específicos baseado no exercício
+            let camposEspecificos = '';
+            
+            if (exercicio.exercicio_id === 1) {
+                // Exercício 1 - Provisionamento de Redes
+                camposEspecificos = `
+                    <div class="campo-item">
+                        <strong>2. Planejamento da VPC/VCN:</strong>
+                        <div class="campo-resposta">${exercicio.vpc_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>3. Estratégia de Sub-redes:</strong>
+                        <div class="campo-resposta">${exercicio.subnets || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>4. Política de Segurança:</strong>
+                        <div class="campo-resposta">${exercicio.security || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>5. Arquitetura de Roteamento:</strong>
+                        <div class="campo-resposta">${exercicio.routing || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>6. Estratégia de Conectividade:</strong>
+                        <div class="campo-resposta">${exercicio.connectivity || 'N/A'}</div>
+                    </div>
+                `;
+            } else if (exercicio.exercicio_id === 2) {
+                // Exercício 2 - Instâncias de Computação
+                camposEspecificos = `
+                    <div class="campo-item">
+                        <strong>2. Planejamento da Instância:</strong>
+                        <div class="campo-resposta">${exercicio.instance_planning || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>3. Estratégia de Armazenamento:</strong>
+                        <div class="campo-resposta">${exercicio.storage_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>4. Segurança e Acesso:</strong>
+                        <div class="campo-resposta">${exercicio.security_access || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>5. Configuração de Rede:</strong>
+                        <div class="campo-resposta">${exercicio.network_setup || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>6. Monitoramento e Custos:</strong>
+                        <div class="campo-resposta">${exercicio.monitoring_costs || 'N/A'}</div>
+                    </div>
+                `;
+            } else if (exercicio.exercicio_id === 3) {
+                // Exercício 3 - Banco de Dados Gerenciado
+                camposEspecificos = `
+                    <div class="campo-item">
+                        <strong>2. Configuração do Banco:</strong>
+                        <div class="campo-resposta">${exercicio.database_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>3. Estratégia de Backup:</strong>
+                        <div class="campo-resposta">${exercicio.backup_strategy || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>4. Alta Disponibilidade:</strong>
+                        <div class="campo-resposta">${exercicio.high_availability || 'N/A'}</div>
+                    </div>
+                `;
+            } else if (exercicio.exercicio_id === 4) {
+                // Exercício 4 - Balanceamento de Carga
+                camposEspecificos = `
+                    <div class="campo-item">
+                        <strong>2. Configuração do Load Balancer:</strong>
+                        <div class="campo-resposta">${exercicio.load_balancer_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>3. Health Checks:</strong>
+                        <div class="campo-resposta">${exercicio.health_check || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>4. Distribuição de Tráfego:</strong>
+                        <div class="campo-resposta">${exercicio.traffic_distribution || 'N/A'}</div>
+                    </div>
+                `;
+            } else if (exercicio.exercicio_id === 5) {
+                // Exercício 5 - Auto Scaling
+                camposEspecificos = `
+                    <div class="campo-item">
+                        <strong>2. Política de Scaling:</strong>
+                        <div class="campo-resposta">${exercicio.scaling_policy || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>3. Configuração de Métricas:</strong>
+                        <div class="campo-resposta">${exercicio.metrics_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>4. Gatilhos de Scaling:</strong>
+                        <div class="campo-resposta">${exercicio.scaling_triggers || 'N/A'}</div>
+                    </div>
+                `;
+            } else if (exercicio.exercicio_id === 6) {
+                // Exercício 6 - Gestão de Identidades
+                camposEspecificos = `
+                    <div class="campo-item">
+                        <strong>2. Configuração de Identidade:</strong>
+                        <div class="campo-resposta">${exercicio.identity_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>3. Controle de Acesso:</strong>
+                        <div class="campo-resposta">${exercicio.access_control || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>4. Gerenciamento de Chaves:</strong>
+                        <div class="campo-resposta">${exercicio.key_management || 'N/A'}</div>
+                    </div>
+                `;
+            } else if (exercicio.exercicio_id === 7) {
+                // Exercício 7 - Monitoramento e Alertas
+                camposEspecificos = `
+                    <div class="campo-item">
+                        <strong>2. Configuração de Monitoramento:</strong>
+                        <div class="campo-resposta">${exercicio.monitoring_setup || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>3. Configuração de Alertas:</strong>
+                        <div class="campo-resposta">${exercicio.alerting_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>4. Configuração de Dashboard:</strong>
+                        <div class="campo-resposta">${exercicio.dashboard_config || 'N/A'}</div>
+                    </div>
+                `;
+            } else if (exercicio.exercicio_id === 8) {
+                // Exercício 8 - Pipeline e Contêineres
+                camposEspecificos = `
+                    <div class="campo-item">
+                        <strong>2. Arquitetura de Contêineres:</strong>
+                        <div class="campo-resposta">${exercicio.container_architecture || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>3. Planejamento do Pipeline CI/CD:</strong>
+                        <div class="campo-resposta">${exercicio.pipeline_planning || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>4. Estratégia de Imagens:</strong>
+                        <div class="campo-resposta">${exercicio.image_strategy || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>5. Configuração de Rede para Contêineres:</strong>
+                        <div class="campo-resposta">${exercicio.container_networking || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>6. Configuração do Pipeline:</strong>
+                        <div class="campo-resposta">${exercicio.pipeline_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>7. Configuração de Contêineres:</strong>
+                        <div class="campo-resposta">${exercicio.container_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>8. Estratégia de Deploy:</strong>
+                        <div class="campo-resposta">${exercicio.deployment_strategy || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>9. Monitoramento e Observabilidade:</strong>
+                        <div class="campo-resposta">${exercicio.container_monitoring || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>10. Segurança de Contêineres:</strong>
+                        <div class="campo-resposta">${exercicio.container_security || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>11. Otimização de Custos:</strong>
+                        <div class="campo-resposta">${exercicio.container_cost_optimization || 'N/A'}</div>
+                    </div>
+                `;
+            } else if (exercicio.exercicio_id === 9) {
+                // Exercício 9 - Resiliência e Backup
+                camposEspecificos = `
+                    <div class="campo-item">
+                        <strong>2. Configuração de Backup:</strong>
+                        <div class="campo-resposta">${exercicio.backup_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>3. Tipos de Backup por Recurso:</strong>
+                        <div class="campo-resposta">${exercicio.backup_types || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>4. Armazenamento de Backups:</strong>
+                        <div class="campo-resposta">${exercicio.backup_storage || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>5. Política de Retenção:</strong>
+                        <div class="campo-resposta">${exercicio.retention_policy || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>6. Recuperação de Desastres:</strong>
+                        <div class="campo-resposta">${exercicio.disaster_recovery_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>7. Alta Disponibilidade:</strong>
+                        <div class="campo-resposta">${exercicio.high_availability_dr || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>8. Replicação de Dados:</strong>
+                        <div class="campo-resposta">${exercicio.data_replication || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>9. Estratégia de Failover:</strong>
+                        <div class="campo-resposta">${exercicio.failover_strategy || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>10. Estratégia de Replicação:</strong>
+                        <div class="campo-resposta">${exercicio.replication_strategy || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>11. Testes de Backup:</strong>
+                        <div class="campo-resposta">${exercicio.backup_testing || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>12. Documentação de Procedimentos DR:</strong>
+                        <div class="campo-resposta">${exercicio.dr_documentation || 'N/A'}</div>
+                    </div>
+                `;
+            } else if (exercicio.exercicio_id === 10) {
+                // Exercício 10 - Integração Final
+                camposEspecificos = `
+                    <div class="campo-item">
+                        <strong>2. Design da Arquitetura:</strong>
+                        <div class="campo-resposta">${exercicio.architecture_design || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>3. Configuração de Integração:</strong>
+                        <div class="campo-resposta">${exercicio.integration_config || 'N/A'}</div>
+                    </div>
+                    <div class="campo-item">
+                        <strong>4. Documentação Final:</strong>
+                        <div class="campo-resposta">${exercicio.final_documentation || 'N/A'}</div>
+                    </div>
+                `;
+            }
+            
+            // Criar modal para mostrar exercício completo
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 90%; max-height: 90%; overflow-y: auto;">
+                    <div class="modal-header">
+                        <h3>Exercício ${exercicio.exercicio_id} - ${exercicio.nome}</h3>
+                        <div class="modal-actions">
+                            <button class="btn-action btn-success" onclick="downloadExercisePDF(${exercicio.id})">
+                                <i class="fas fa-download"></i> Baixar PDF
+                            </button>
+                            <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                            <div>
+                                <h4>📋 Informações Básicas</h4>
+                                <p><strong>Nome:</strong> ${exercicio.nome || 'N/A'}</p>
+                                <p><strong>Matrícula:</strong> ${exercicio.matricula || 'N/A'}</p>
+                                <p><strong>Plataforma:</strong> ${exercicio.plataforma || 'N/A'}</p>
+                                <p><strong>Data de Envio:</strong> ${exercicio.created_at ? new Date(exercicio.created_at).toLocaleString('pt-BR') : 'N/A'}</p>
+                            </div>
+                            <div>
+                                <h4>📝 Respostas do Exercício</h4>
+                                <div class="campo-item">
+                                    <strong>1. Objetivo da Prática:</strong>
+                                    <div class="campo-resposta">${exercicio.objetivo || 'N/A'}</div>
+                                </div>
+                                ${camposEspecificos}
+                                <div class="campo-item">
+                                    <strong>7. Passos que você seguiu:</strong>
+                                    <div class="campo-resposta">${exercicio.passos || 'N/A'}</div>
+                                </div>
+                                <div class="campo-item">
+                                    <strong>8. Resultado obtido:</strong>
+                                    <div class="campo-resposta">${exercicio.resultado || 'N/A'}</div>
+                                </div>
+                                <div class="campo-item">
+                                    <strong>9. Dificuldades encontradas:</strong>
+                                    <div class="campo-resposta">${exercicio.dificuldades || 'N/A'}</div>
+                                </div>
+                                <div class="campo-item">
+                                    <strong>10. Principais aprendizados:</strong>
+                                    <div class="campo-resposta">${exercicio.aprendizado || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Criar gráfico de progresso
+        function createProgressChart() {
+            const ctx = document.getElementById('progressChart');
+            if (!ctx) return;
+
+            // Agrupar exercícios por ID
+            const exerciciosAgrupados = {};
+            allExercises.forEach(exercicio => {
+                if (!exerciciosAgrupados[exercicio.exercicio_id]) {
+                    exerciciosAgrupados[exercicio.exercicio_id] = [];
+                }
+                exerciciosAgrupados[exercicio.exercicio_id].push(exercicio);
+            });
+
+            const exercicioIds = Object.keys(exerciciosAgrupados).sort((a, b) => parseInt(a) - parseInt(b));
+            const totalAlunos = allStudents.length;
+            
+            const dados = exercicioIds.map(id => {
+                const exercicios = exerciciosAgrupados[id];
+                return Math.round((exercicios.length / totalAlunos) * 100);
+            });
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: exercicioIds.map(id => `Exercício ${id}`),
+                    datasets: [{
+                        label: 'Taxa de Conclusão (%)',
+                        data: dados,
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Criar gráfico de plataformas
+        function createPlatformChart() {
+            const ctx = document.getElementById('platformChart');
+            if (!ctx) return;
+
+            // Contar plataformas
+            const plataformas = {};
+            allExercises.forEach(exercicio => {
+                const plataforma = exercicio.plataforma || 'Não informado';
+                plataformas[plataforma] = (plataformas[plataforma] || 0) + 1;
+            });
+
+            const labels = Object.keys(plataformas);
+            const dados = Object.values(plataformas);
+            const cores = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dados,
+                        backgroundColor: cores.slice(0, labels.length),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Atualizar tabela de progresso
+        function updateProgressTable() {
+            const tbody = document.getElementById('progress-table');
+            tbody.innerHTML = '';
+
+            // Agrupar exercícios por ID
+            const exerciciosAgrupados = {};
+            allExercises.forEach(exercicio => {
+                if (!exerciciosAgrupados[exercicio.exercicio_id]) {
+                    exerciciosAgrupados[exercicio.exercicio_id] = [];
+                }
+                exerciciosAgrupados[exercicio.exercicio_id].push(exercicio);
+            });
+
+            const exercicioIds = Object.keys(exerciciosAgrupados).sort((a, b) => parseInt(a) - parseInt(b));
+            const totalAlunos = allStudents.length;
+
+            exercicioIds.forEach(exercicioId => {
+                const exercicios = exerciciosAgrupados[exercicioId];
+                const alunosEntregaram = exercicios.length;
+                const taxaConclusao = totalAlunos > 0 ? Math.round((alunosEntregaram / totalAlunos) * 100) : 0;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Exercício ${exercicioId}</td>
+                    <td>${alunosEntregaram}</td>
+                    <td>${taxaConclusao}%</td>
+                    <td>
+                        <span class="status-badge ${taxaConclusao >= 80 ? 'success' : taxaConclusao >= 50 ? 'warning' : 'danger'}">
+                            ${taxaConclusao >= 80 ? 'Excelente' : taxaConclusao >= 50 ? 'Bom' : 'Atenção'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Função para baixar todos os PDFs de um exercício específico
+        async function downloadAllExercisePDFs(exercicioId) {
+            try {
+                // Confirmar ação
+                const confirmacao = confirm(`Deseja baixar todos os PDFs do Exercício ${exercicioId}?\n\nIsso irá gerar um PDF para cada aluno que entregou este exercício.`);
+                if (!confirmacao) return;
+                
+                // Buscar todos os exercícios do tipo especificado
+                const exerciciosDoTipo = allExercises.filter(ex => ex.exercicio_id === exercicioId);
+                
+                if (exerciciosDoTipo.length === 0) {
+                    alert(`Nenhum exercício ${exercicioId} foi encontrado.`);
+                    return;
+                }
+                
+                // Mostrar loading
+                const loadingModal = document.createElement('div');
+                loadingModal.className = 'modal';
+                loadingModal.style.display = 'block';
+                loadingModal.innerHTML = `
+                    <div class="modal-content" style="max-width: 400px; text-align: center;">
+                        <div class="modal-body">
+                            <div style="margin-bottom: 1rem;">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--admin-primary);"></i>
+                            </div>
+                            <h3>Gerando PDFs...</h3>
+                            <p>Processando ${exerciciosDoTipo.length} exercícios...</p>
+                            <div id="progress-text">Preparando...</div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(loadingModal);
+                
+                // Gerar PDFs com delay para não sobrecarregar o navegador
+                const { jsPDF } = window.jspdf;
+                
+                for (let i = 0; i < exerciciosDoTipo.length; i++) {
+                    const exercicio = exerciciosDoTipo[i];
+                    
+                    // Atualizar progresso
+                    const progressText = document.getElementById('progress-text');
+                    if (progressText) {
+                        progressText.textContent = `Gerando PDF ${i + 1} de ${exerciciosDoTipo.length}: ${exercicio.nome}`;
+                    }
+                    
+                    // Aguardar um pouco para não sobrecarregar
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Gerar PDF
+                    await generateSinglePDF(exercicio, jsPDF);
+                }
+                
+                // Remover loading
+                loadingModal.remove();
+                
+                // Mostrar sucesso
+                alert(`✅ Sucesso!\n\n${exerciciosDoTipo.length} PDFs foram gerados e baixados.\n\nArquivos salvos na pasta de Downloads.`);
+                
+            } catch (error) {
+                console.error('Erro ao baixar PDFs:', error);
+                alert('❌ Erro ao gerar PDFs. Tente novamente.');
+                
+                // Remover loading se existir
+                const loadingModal = document.querySelector('.modal');
+                if (loadingModal && loadingModal.innerHTML.includes('Gerando PDFs')) {
+                    loadingModal.remove();
+                }
+            }
+        }
+        
+        // Função auxiliar para gerar um PDF individual
+        async function generateSinglePDF(exercicio, jsPDF) {
+            return new Promise((resolve) => {
+                const doc = new jsPDF();
+                
+                // Configurar fonte
+                doc.setFont('helvetica');
+                
+                // Título
+                doc.setFontSize(18);
+                doc.text(`Exercício ${exercicio.exercicio_id} - ${exercicio.nome}`, 20, 30);
+                
+                // Informações básicas
+                doc.setFontSize(12);
+                doc.text('INFORMAÇÕES BÁSICAS', 20, 50);
+                doc.setFontSize(10);
+                doc.text(`Nome: ${exercicio.nome || 'N/A'}`, 20, 60);
+                doc.text(`Matrícula: ${exercicio.matricula || 'N/A'}`, 20, 65);
+                doc.text(`Plataforma: ${exercicio.plataforma || 'N/A'}`, 20, 70);
+                doc.text(`Data de Envio: ${exercicio.created_at ? new Date(exercicio.created_at).toLocaleString('pt-BR') : 'N/A'}`, 20, 75);
+                
+                // Respostas
+                doc.setFontSize(12);
+                doc.text('RESPOSTAS DO EXERCÍCIO', 20, 90);
+                
+                let yPosition = 100;
+                const pageHeight = doc.internal.pageSize.height;
+                const margin = 20;
+                const lineHeight = 6;
+                
+                // Função para adicionar texto com quebra de página
+                function addTextWithPageBreak(text, title) {
+                    if (yPosition > pageHeight - 30) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+                    
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(title, margin, yPosition);
+                    yPosition += lineHeight;
+                    
+                    doc.setFont('helvetica', 'normal');
+                    const lines = doc.splitTextToSize(text || 'N/A', 170);
+                    
+                    for (let i = 0; i < lines.length; i++) {
+                        if (yPosition > pageHeight - 20) {
+                            doc.addPage();
+                            yPosition = 20;
+                        }
+                        doc.text(lines[i], margin, yPosition);
+                        yPosition += lineHeight;
+                    }
+                    yPosition += 5;
+                }
+                
+                // Adicionar campos na ordem correta
+                addTextWithPageBreak(exercicio.objetivo, '1. Objetivo da Prática:');
+                
+                // Campos específicos baseado no exercício
+                if (exercicio.exercicio_id === 1) {
+                    addTextWithPageBreak(exercicio.vpc_config, '2. Planejamento da VPC/VCN:');
+                    addTextWithPageBreak(exercicio.subnets, '3. Estratégia de Sub-redes:');
+                    addTextWithPageBreak(exercicio.security, '4. Política de Segurança:');
+                    addTextWithPageBreak(exercicio.routing, '5. Arquitetura de Roteamento:');
+                    addTextWithPageBreak(exercicio.connectivity, '6. Estratégia de Conectividade:');
+                } else if (exercicio.exercicio_id === 2) {
+                    addTextWithPageBreak(exercicio.instance_planning, '2. Planejamento da Instância:');
+                    addTextWithPageBreak(exercicio.storage_config, '3. Estratégia de Armazenamento:');
+                    addTextWithPageBreak(exercicio.security_access, '4. Segurança e Acesso:');
+                    addTextWithPageBreak(exercicio.network_setup, '5. Configuração de Rede:');
+                    addTextWithPageBreak(exercicio.monitoring_costs, '6. Monitoramento e Custos:');
+                } else if (exercicio.exercicio_id === 3) {
+                    addTextWithPageBreak(exercicio.database_config, '2. Configuração do Banco:');
+                    addTextWithPageBreak(exercicio.backup_strategy, '3. Estratégia de Backup:');
+                    addTextWithPageBreak(exercicio.high_availability, '4. Alta Disponibilidade:');
+                } else if (exercicio.exercicio_id === 4) {
+                    addTextWithPageBreak(exercicio.load_balancer_config, '2. Configuração do Load Balancer:');
+                    addTextWithPageBreak(exercicio.health_check, '3. Health Checks:');
+                    addTextWithPageBreak(exercicio.traffic_distribution, '4. Distribuição de Tráfego:');
+                } else if (exercicio.exercicio_id === 5) {
+                    addTextWithPageBreak(exercicio.scaling_policy, '2. Política de Scaling:');
+                    addTextWithPageBreak(exercicio.metrics_config, '3. Configuração de Métricas:');
+                    addTextWithPageBreak(exercicio.scaling_triggers, '4. Gatilhos de Scaling:');
+                } else if (exercicio.exercicio_id === 6) {
+                    addTextWithPageBreak(exercicio.identity_config, '2. Configuração de Identidade:');
+                    addTextWithPageBreak(exercicio.access_control, '3. Controle de Acesso:');
+                    addTextWithPageBreak(exercicio.key_management, '4. Gerenciamento de Chaves:');
+                } else if (exercicio.exercicio_id === 7) {
+                    addTextWithPageBreak(exercicio.monitoring_setup, '2. Configuração de Monitoramento:');
+                    addTextWithPageBreak(exercicio.alerting_config, '3. Configuração de Alertas:');
+                    addTextWithPageBreak(exercicio.dashboard_config, '4. Configuração de Dashboard:');
+                } else if (exercicio.exercicio_id === 8) {
+                    addTextWithPageBreak(exercicio.pipeline_config, '2. Configuração de Pipeline:');
+                    addTextWithPageBreak(exercicio.container_config, '3. Configuração de Contêineres:');
+                    addTextWithPageBreak(exercicio.deployment_strategy, '4. Estratégia de Deploy:');
+                } else if (exercicio.exercicio_id === 9) {
+                    addTextWithPageBreak(exercicio.backup_config, '2. Configuração de Backup:');
+                    addTextWithPageBreak(exercicio.disaster_recovery, '3. Recuperação de Desastres:');
+                    addTextWithPageBreak(exercicio.data_replication, '4. Replicação de Dados:');
+                } else if (exercicio.exercicio_id === 10) {
+                    addTextWithPageBreak(exercicio.architecture_design, '2. Design da Arquitetura:');
+                    addTextWithPageBreak(exercicio.integration_config, '3. Configuração de Integração:');
+                    addTextWithPageBreak(exercicio.final_documentation, '4. Documentação Final:');
+                }
+                
+                addTextWithPageBreak(exercicio.passos, '7. Passos que você seguiu:');
+                addTextWithPageBreak(exercicio.resultado, '8. Resultado obtido:');
+                addTextWithPageBreak(exercicio.dificuldades, '9. Dificuldades encontradas:');
+                addTextWithPageBreak(exercicio.aprendizado, '10. Principais aprendizados:');
+                
+                // Baixar o PDF
+                const fileName = `Exercicio_${exercicio.exercicio_id}_${exercicio.nome.replace(/\s+/g, '_')}_${exercicio.matricula}.pdf`;
+                doc.save(fileName);
+                
+                resolve();
+            });
+        }
+
+        // Função para baixar PDF do exercício
+        function downloadExercisePDF(exercicioId) {
+            const exercicio = allExercises.find(ex => ex.id === exercicioId);
+            
+            if (!exercicio) {
+                alert('Exercício não encontrado.');
+                return;
+            }
+            
+            // Criar e baixar PDF usando jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Configurar fonte
+            doc.setFont('helvetica');
+            
+            // Título
+            doc.setFontSize(18);
+            doc.text(`Exercício ${exercicio.exercicio_id} - ${exercicio.nome}`, 20, 30);
+            
+            // Informações básicas
+            doc.setFontSize(12);
+            doc.text('INFORMAÇÕES BÁSICAS', 20, 50);
+            doc.setFontSize(10);
+            doc.text(`Nome: ${exercicio.nome || 'N/A'}`, 20, 60);
+            doc.text(`Matrícula: ${exercicio.matricula || 'N/A'}`, 20, 65);
+            doc.text(`Plataforma: ${exercicio.plataforma || 'N/A'}`, 20, 70);
+            doc.text(`Data de Envio: ${exercicio.created_at ? new Date(exercicio.created_at).toLocaleString('pt-BR') : 'N/A'}`, 20, 75);
+            
+            // Respostas
+            doc.setFontSize(12);
+            doc.text('RESPOSTAS DO EXERCÍCIO', 20, 90);
+            
+            let yPosition = 100;
+            const pageHeight = doc.internal.pageSize.height;
+            const margin = 20;
+            const lineHeight = 6;
+            
+            // Função para adicionar texto com quebra de página
+            function addTextWithPageBreak(text, title) {
+                if (yPosition > pageHeight - 30) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text(title, margin, yPosition);
+                yPosition += lineHeight;
+                
+                doc.setFont('helvetica', 'normal');
+                const lines = doc.splitTextToSize(text || 'N/A', 170);
+                
+                for (let i = 0; i < lines.length; i++) {
+                    if (yPosition > pageHeight - 20) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+                    doc.text(lines[i], margin, yPosition);
+                    yPosition += lineHeight;
+                }
+                yPosition += 5;
+            }
+            
+            // Adicionar campos na ordem correta
+            addTextWithPageBreak(exercicio.objetivo, '1. Objetivo da Prática:');
+            
+            // Campos específicos baseado no exercício
+            if (exercicio.exercicio_id === 1) {
+                addTextWithPageBreak(exercicio.vpc_config, '2. Planejamento da VPC/VCN:');
+                addTextWithPageBreak(exercicio.subnets, '3. Estratégia de Sub-redes:');
+                addTextWithPageBreak(exercicio.security, '4. Política de Segurança:');
+                addTextWithPageBreak(exercicio.routing, '5. Arquitetura de Roteamento:');
+                addTextWithPageBreak(exercicio.connectivity, '6. Estratégia de Conectividade:');
+            } else if (exercicio.exercicio_id === 2) {
+                addTextWithPageBreak(exercicio.instance_planning, '2. Planejamento da Instância:');
+                addTextWithPageBreak(exercicio.storage_config, '3. Estratégia de Armazenamento:');
+                addTextWithPageBreak(exercicio.security_access, '4. Segurança e Acesso:');
+                addTextWithPageBreak(exercicio.network_setup, '5. Configuração de Rede:');
+                addTextWithPageBreak(exercicio.monitoring_costs, '6. Monitoramento e Custos:');
+            } else if (exercicio.exercicio_id === 3) {
+                addTextWithPageBreak(exercicio.database_config, '2. Configuração do Banco:');
+                addTextWithPageBreak(exercicio.backup_strategy, '3. Estratégia de Backup:');
+                addTextWithPageBreak(exercicio.high_availability, '4. Alta Disponibilidade:');
+            } else if (exercicio.exercicio_id === 4) {
+                addTextWithPageBreak(exercicio.load_balancer_config, '2. Configuração do Load Balancer:');
+                addTextWithPageBreak(exercicio.health_check, '3. Health Checks:');
+                addTextWithPageBreak(exercicio.traffic_distribution, '4. Distribuição de Tráfego:');
+            } else if (exercicio.exercicio_id === 5) {
+                addTextWithPageBreak(exercicio.scaling_policy, '2. Política de Scaling:');
+                addTextWithPageBreak(exercicio.metrics_config, '3. Configuração de Métricas:');
+                addTextWithPageBreak(exercicio.scaling_triggers, '4. Gatilhos de Scaling:');
+            } else if (exercicio.exercicio_id === 6) {
+                addTextWithPageBreak(exercicio.identity_config, '2. Configuração de Identidade:');
+                addTextWithPageBreak(exercicio.access_control, '3. Controle de Acesso:');
+                addTextWithPageBreak(exercicio.key_management, '4. Gerenciamento de Chaves:');
+            } else if (exercicio.exercicio_id === 7) {
+                addTextWithPageBreak(exercicio.monitoring_setup, '2. Configuração de Monitoramento:');
+                addTextWithPageBreak(exercicio.alerting_config, '3. Configuração de Alertas:');
+                addTextWithPageBreak(exercicio.dashboard_config, '4. Configuração de Dashboard:');
+            } else if (exercicio.exercicio_id === 8) {
+                addTextWithPageBreak(exercicio.pipeline_config, '2. Configuração de Pipeline:');
+                addTextWithPageBreak(exercicio.container_config, '3. Configuração de Contêineres:');
+                addTextWithPageBreak(exercicio.deployment_strategy, '4. Estratégia de Deploy:');
+            } else if (exercicio.exercicio_id === 9) {
+                addTextWithPageBreak(exercicio.backup_config, '2. Configuração de Backup:');
+                addTextWithPageBreak(exercicio.disaster_recovery, '3. Recuperação de Desastres:');
+                addTextWithPageBreak(exercicio.data_replication, '4. Replicação de Dados:');
+            } else if (exercicio.exercicio_id === 10) {
+                addTextWithPageBreak(exercicio.architecture_design, '2. Design da Arquitetura:');
+                addTextWithPageBreak(exercicio.integration_config, '3. Configuração de Integração:');
+                addTextWithPageBreak(exercicio.final_documentation, '4. Documentação Final:');
+            }
+            
+            addTextWithPageBreak(exercicio.passos, '7. Passos que você seguiu:');
+            addTextWithPageBreak(exercicio.resultado, '8. Resultado obtido:');
+            addTextWithPageBreak(exercicio.dificuldades, '9. Dificuldades encontradas:');
+            addTextWithPageBreak(exercicio.aprendizado, '10. Principais aprendizados:');
+            
+            // Baixar o PDF
+            const fileName = `Exercicio_${exercicio.exercicio_id}_${exercicio.nome.replace(/\s+/g, '_')}_${exercicio.matricula}.pdf`;
+            doc.save(fileName);
+        }
+
+        // Inicialização — verificar autenticação via Supabase Auth
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Limpar sessões legadas
+            if (window.Security) window.Security.limparSessaoLegada();
+
+            // Verificar autenticação real (JWT)
+            const ok = await verificarAutenticacaoAdmin();
+            if (!ok) return;
+
+            // Mostrar informações do admin
+            const nomeEl      = document.getElementById('admin-name');
+            const matriculaEl = document.getElementById('admin-matricula');
+            if (nomeEl      && adminSession) nomeEl.textContent      = adminSession.nome || '';
+            if (matriculaEl && adminSession) matriculaEl.textContent = adminSession.matricula || '';
+
+            // Carregar dados do dashboard
+            loadDashboardData();
+        });
+
+        // Fechar modais ao clicar fora
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
