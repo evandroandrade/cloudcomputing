@@ -3413,11 +3413,10 @@ async function loadExercicioData(exercicioId) {
         const exercicio = await window.buscarExercicioPorUsuario(exercicioId);
         
         if (exercicio && exercicio.success && exercicio.data) {
-            console.log(`✅ Exercício ${exercicioId} encontrado para usuário ${matricula}`);
-            console.log(`📊 Dados do exercício:`, exercicio.data);
+            console.log(`✅ Exercício ${exercicioId} carregado`);
             preencherFormularioComDados(exercicioId, exercicio.data);
         } else {
-            console.log(`ℹ️ Exercício ${exercicioId} não encontrado para usuário ${matricula}`);
+            console.log(`ℹ️ Exercício ${exercicioId} não encontrado`);
             limparFormulario(exercicioId);
         }
         

@@ -161,18 +161,21 @@
             const client = getClient();
             if (!client) throw new Error('Cliente Supabase não inicializado.');
 
+            // Buscar o registro mais recente para esse exercício do usuário logado
+            // Usar .limit(1) + .order para evitar falha quando houver duplicatas legadas
             const { data, error } = await client
                 .from('exercicios')
                 .select('*')
                 .eq('exercicio_id', exercicioId)
-                .maybeSingle();
+                .order('created_at', { ascending: false })
+                .limit(1);
 
             if (error) throw error;
 
-            return { success: true, data: data || null };
+            return { success: true, data: (data && data.length > 0) ? data[0] : null };
 
         } catch (error) {
-            console.error('[supabase.js] Erro ao buscar exercício:', error.message);
+            console.warn('[supabase.js] Erro ao buscar exercício:', error.message);
             return { success: false, data: null, error: error.message };
         }
     }
