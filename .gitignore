@@ -1,43 +1,13 @@
-# =============================================================================
-# .gitignore — Cloud Computing Project
-# =============================================================================
-
-# ⚠️  SECRETS — NUNCA COMMITAR
-.env
-.env.local
-.env.*.local
-*.env
-
-# Supabase secrets
-supabase/.env
-supabase/config.toml.local
-
-# Node.js
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Arquivos de sistema
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# IDEs
-.vscode/settings.json
-.idea/
-*.swp
-*.swo
-
-# Build outputs
-dist/
-build/
-.cache/
-
-# Logs
-*.log
-logs/
-
-# Temporários
-*.tmp
-*.temp
+migrations/
+scripts/
+supabase/
+.env
+*.bat
+MIGRACAO_AUTH.md
+package.json
+package-lock.json
+exercicios.json
+test-*.html
+teste-*.html
+*.md
