@@ -978,10 +978,10 @@
                         </td>
                         <td>
                             <div class="btn-group">
-                                <button class="btn-action btn-primary" onclick="viewExerciseDetails(${exercicioId})">
+                                <button class="btn-action btn-primary" onclick="viewExerciseDetails(${exercicioId}, ${ano})">
                                     <i class="fas fa-eye"></i> Ver Detalhes
                                 </button>
-                                <button class="btn-action btn-success" onclick="downloadAllExercisePDFs(${exercicioId})">
+                                <button class="btn-action btn-success" onclick="downloadAllExercisePDFs(${exercicioId}, ${ano})">
                                     <i class="fas fa-download"></i> Baixar PDFs
                                 </button>
                             </div>
@@ -1331,8 +1331,13 @@
         }
 
         // Visualizar detalhes de um exercício
-        function viewExerciseDetails(exercicioId) {
-            const exerciciosDoExercicio = allExercises.filter(ex => ex.exercicio_id === exercicioId);
+        function viewExerciseDetails(exercicioId, ano) {
+            const exerciciosDoExercicio = allExercises.filter(ex => {
+                const exAno = ex.created_at ? new Date(ex.created_at).getFullYear() : null;
+                const matchId = ex.exercicio_id === exercicioId || ex.exercicio_id === parseInt(exercicioId);
+                const matchAno = ano ? exAno == ano : true;
+                return matchId && matchAno;
+            });
             
             if (exerciciosDoExercicio.length === 0) {
                 alert('Nenhum exercício encontrado para este ID.');
@@ -1346,7 +1351,7 @@
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 90%; max-height: 90%; overflow-y: auto;">
                     <div class="modal-header">
-                        <h3>Detalhes do Exercício ${exercicioId}</h3>
+                        <h3>Detalhes do Exercício ${exercicioId} ${ano ? '— Turma ' + ano : ''}</h3>
                         <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
                     </div>
                     <div class="modal-body">
@@ -1818,14 +1823,19 @@
         }
 
         // Função para baixar todos os PDFs de um exercício específico
-        async function downloadAllExercisePDFs(exercicioId) {
+        async function downloadAllExercisePDFs(exercicioId, ano) {
             try {
-                // Confirmar ação
-                const confirmacao = confirm(`Deseja baixar todos os PDFs do Exercício ${exercicioId}?\n\nIsso irá gerar um PDF para cada aluno que entregou este exercício.`);
+                const labelAno = ano ? ` — Turma ${ano}` : '';
+                const confirmacao = confirm(`Deseja baixar todos os PDFs do Exercício ${exercicioId}${labelAno}?\n\nIsso irá gerar um PDF para cada aluno que entregou este exercício.`);
                 if (!confirmacao) return;
                 
-                // Buscar todos os exercícios do tipo especificado
-                const exerciciosDoTipo = allExercises.filter(ex => ex.exercicio_id === exercicioId);
+                // Filtrar por exercicioId e ano
+                const exerciciosDoTipo = allExercises.filter(ex => {
+                    const exAno = ex.created_at ? new Date(ex.created_at).getFullYear() : null;
+                    const matchId = ex.exercicio_id === exercicioId || ex.exercicio_id === parseInt(exercicioId);
+                    const matchAno = ano ? exAno == ano : true;
+                    return matchId && matchAno;
+                });
                 
                 if (exerciciosDoTipo.length === 0) {
                     alert(`Nenhum exercício ${exercicioId} foi encontrado.`);
