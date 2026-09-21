@@ -15,7 +15,7 @@ jobs:
       - name: Setup lftp
         run: sudo apt-get install -y lftp
 
-      - name: Deploy via LFTP para HostGator
+      - name: Criar pastas no servidor
         env:
           FTP_HOST: ftp.evandroandrade.com
           FTP_USER: ${{ secrets.FTP_USERNAME }}
@@ -23,25 +23,60 @@ jobs:
         run: |
           lftp -c "
             set ftp:ssl-allow no;
-            set net:timeout 30;
-            set net:max-retries 3;
-            set mirror:use-pget-n 5;
             open ftp://$FTP_USER:$FTP_PASS@$FTP_HOST;
-            mirror --reverse --delete --verbose --parallel=5 \
-              --exclude-glob .git/ \
-              --exclude-glob .github/ \
-              --exclude-glob node_modules/ \
-              --exclude-glob migrations/ \
-              --exclude-glob scripts/ \
-              --exclude-glob supabase/ \
-              --exclude-glob .env \
-              --exclude-glob .env.example \
-              --exclude-glob '*.bat' \
-              --exclude-glob '*.md' \
-              --exclude-glob 'teste-*.html' \
-              --exclude-glob 'test-*.html' \
-              --exclude-glob 'package.json' \
-              --exclude-glob 'package-lock.json' \
-              . /public_html/cloudcomputing;
+            mkdir -p /public_html/cloudcomputing/js;
+            mkdir -p /public_html/cloudcomputing/config;
+            quit
+          "
+
+      - name: Upload arquivos raiz
+        env:
+          FTP_HOST: ftp.evandroandrade.com
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          lftp -c "
+            set ftp:ssl-allow no;
+            open ftp://$FTP_USER:$FTP_PASS@$FTP_HOST;
+            cd /public_html/cloudcomputing;
+            put index.html;
+            put admin.html;
+            put admin-login.html;
+            put styles.css;
+            put script.js;
+            put favicon.ico;
+            put browserconfig.xml;
+            put manifest.json;
+            mput *.png;
+            quit
+          "
+
+      - name: Upload pasta js/
+        env:
+          FTP_HOST: ftp.evandroandrade.com
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          lftp -c "
+            set ftp:ssl-allow no;
+            open ftp://$FTP_USER:$FTP_PASS@$FTP_HOST;
+            cd /public_html/cloudcomputing/js;
+            put js/security.js -o security.js;
+            put js/secure-auth.js -o secure-auth.js;
+            quit
+          "
+
+      - name: Upload pasta config/
+        env:
+          FTP_HOST: ftp.evandroandrade.com
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          lftp -c "
+            set ftp:ssl-allow no;
+            open ftp://$FTP_USER:$FTP_PASS@$FTP_HOST;
+            cd /public_html/cloudcomputing/config;
+            put config/supabase.js -o supabase.js;
+            put config/exercicios.json -o exercicios.json;
             quit
           "
