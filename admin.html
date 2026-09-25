@@ -1223,24 +1223,18 @@
             });
         }
 
-        // Reset de senha via Edge Function admin-users
+        // Reset de senha via RPC admin_reset_password
         async function resetStudentPassword(matricula) {
             const student = allStudents.find(s => s.matricula === matricula);
             const nome = student ? student.nome : matricula;
             if (!await adminConfirm(`Resetar a senha de "${nome}" para a própria matrícula?<br><small>O aluno precisará definir uma nova senha no próximo acesso.</small>`, 'Resetar Senha')) return;
 
             try {
-                const { data: { session } } = await window.supabaseClient.auth.getSession();
-                const resp = await fetch(`${window.SUPABASE_URL}/functions/v1/admin-users`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.access_token}`
-                    },
-                    body: JSON.stringify({ action: 'reset_password', matricula })
+                const { data, error } = await window.supabaseClient.rpc('admin_reset_password', {
+                    p_matricula: matricula
                 });
-                const resultado = await resp.json();
-                if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
+                if (error) throw error;
+                if (data && !data.success) throw new Error(data.error || 'Erro desconhecido');
                 adminToast('Senha temporária redefinida para a matrícula. O aluno deverá alterar no próximo acesso.', 'success');
                 loadStudentsData();
             } catch (error) {
@@ -1261,7 +1255,7 @@
             document.getElementById('editStudentModal').style.display = 'block';
         }
 
-        // Salvar edição do aluno via Edge Function
+        // Salvar edição do aluno via RPC admin_update_profile
         async function saveStudentEdit() {
             const studentId = document.getElementById('edit-student-id').value;
             const nome      = document.getElementById('edit-student-name').value.trim();
@@ -1269,28 +1263,17 @@
 
             if (!nome) { adminToast('Nome é obrigatório.', 'warning'); return; }
 
-            // Descobrir auth_user_id do aluno
             const student = allStudents.find(s => s.id === studentId || s.id === parseInt(studentId));
             if (!student) { adminToast('Aluno não encontrado.', 'error'); return; }
 
             try {
-                const { data: { session } } = await window.supabaseClient.auth.getSession();
-                const resp = await fetch(`${window.SUPABASE_URL}/functions/v1/admin-users`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.access_token}`
-                    },
-                    body: JSON.stringify({
-                        action: 'update_profile',
-                        auth_user_id: student.auth_user_id,
-                        nome,
-                        email
-                    })
+                const { data, error } = await window.supabaseClient.rpc('admin_update_profile', {
+                    p_auth_user_id: student.auth_user_id,
+                    p_nome: nome,
+                    p_email: email || null
                 });
-                const resultado = await resp.json();
-                if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
-
+                if (error) throw error;
+                if (data && !data.success) throw new Error(data.error || 'Erro desconhecido');
                 adminToast('Aluno atualizado com sucesso!', 'success');
                 closeModal('editStudentModal');
                 loadStudentsData();
@@ -1299,34 +1282,21 @@
             }
         }
 
-        // Desabilitar aluno (preserva histórico) via Edge Function
+        // Desabilitar/Reativar aluno via RPC admin_set_disabled
         async function deleteStudent(studentId) {
             const student = allStudents.find(s => s.id === studentId || s.id === parseInt(studentId));
             if (!student) return;
-
             const estaDesabilitado = student.desabilitado === true;
             const acao = estaDesabilitado ? 'reativar' : 'desabilitar';
             const novoEstado = !estaDesabilitado;
-
             if (!await adminConfirm(`Deseja ${acao} o aluno "<strong>${student.nome}</strong>"?<br><small>O histórico e exercícios serão preservados.</small>`, `${acao.charAt(0).toUpperCase() + acao.slice(1)} Aluno`)) return;
-
             try {
-                const { data: { session } } = await window.supabaseClient.auth.getSession();
-                const resp = await fetch(`${window.SUPABASE_URL}/functions/v1/admin-users`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.access_token}`
-                    },
-                    body: JSON.stringify({
-                        action: 'set_disabled',
-                        auth_user_id: student.auth_user_id,
-                        desabilitado: novoEstado
-                    })
+                const { data, error } = await window.supabaseClient.rpc('admin_set_disabled', {
+                    p_auth_user_id: student.auth_user_id,
+                    p_desabilitado: novoEstado
                 });
-                const resultado = await resp.json();
-                if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
-
+                if (error) throw error;
+                if (data && !data.success) throw new Error(data.error || 'Erro desconhecido');
                 adminToast(`Aluno ${novoEstado ? 'desabilitado' : 'reativado'} com sucesso!`, 'success');
                 loadStudentsData();
             } catch (error) {
@@ -1334,28 +1304,21 @@
             }
         }
 
-        // Adicionar novo aluno via Edge Function admin-users
+        // Adicionar novo aluno via RPC admin_create_student
         async function addNewStudent() {
             const nome      = document.getElementById('new-student-name').value.trim();
             const matricula = document.getElementById('new-student-matricula').value.trim();
             const email     = document.getElementById('new-student-email').value.trim();
-
             if (!nome || !matricula) { adminToast('Nome e matrícula são obrigatórios.', 'warning'); return; }
-
             try {
-                const { data: { session } } = await window.supabaseClient.auth.getSession();
-                const resp = await fetch(`${window.SUPABASE_URL}/functions/v1/admin-users`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.access_token}`
-                    },
-                    body: JSON.stringify({ action: 'create', nome, matricula, email })
+                const { data, error } = await window.supabaseClient.rpc('admin_create_student', {
+                    p_matricula: matricula,
+                    p_nome: nome,
+                    p_email: email || null
                 });
-                const resultado = await resp.json();
-                if (!resp.ok) throw new Error(resultado.error || 'Erro desconhecido');
-
-                adminToast(`Aluno adicionado! Senha temporária: matrícula (${matricula}). O aluno deverá trocar no primeiro acesso.`, 'success', 6000);
+                if (error) throw error;
+                if (data && !data.success) throw new Error(data.error || 'Erro desconhecido');
+                adminToast(`Aluno adicionado! Senha temporária: ${matricula}. O aluno deverá trocar no primeiro acesso.`, 'success', 6000);
                 closeModal('addStudentModal');
                 document.getElementById('addStudentForm').reset();
                 loadStudentsData();
